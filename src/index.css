@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Albert Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+.font-brand {
+  font-family: 'Sedgwick Ave Display', cursive;
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   BLINDAJE DE CONTRASTE WCAG AA Y 5 ESTADOS INTERACTIVOS
+   ========================================================================== */
+.force-text-white,
+.btn-emergency,
+.btn-delito {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   DESACTIVACIÓN DE ESTILO AUTOFILL CELESTE/BLANCO DE CHROME / WEBKIT
+   ========================================================================== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #facc15, 0 0 0 5px rgba(2, 6, 23, 0.8) !important;
+}
+
+/* 5 Estados Interactivos */
+.btn-interactive {
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-interactive:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.08);
+}
+.btn-interactive:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+  filter: brightness(0.92);
+}
+.btn-interactive:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   BOTÓN DE PÁNICO FLOTANTE (SOS) — LEY DE FITTS
+   ========================================================================== */
+.sos-button-glow {
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.45);
+}
+
+.sos-button-glow:hover {
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.65);
+}
+
+/* ==========================================================================
+   MARCOS DE REPUTACIÓN VECINAL (GAMIFICACIÓN)
+   ========================================================================== */
+.avatar-bronce {
+  border: 3px solid #b45309;
+  box-shadow: 0 0 10px rgba(180, 83, 9, 0.4);
+}
+.avatar-plata {
+  border: 3px solid #94a3b8;
+  box-shadow: 0 0 10px rgba(148, 163, 184, 0.4);
+}
+.avatar-oro {
+  border: 3px solid #eab308;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.5);
+}
+.avatar-diamante {
+  border: 3px solid #06b6d4;
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.6);
+}
+
+/* Canvas de mapa con textura oscura */
+.map-canvas-container {
+  background-color: #212529;
+  background-image: 
+    radial-gradient(#343a40 1.5px, transparent 1.5px),
+    radial-gradient(#2c3036 1.5px, #1a1d20 1.5px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+}
+
+.light .map-canvas-container {
+  background-color: #e2e8f0;
+  background-image: 
+    radial-gradient(#cbd5e1 1.5px, transparent 1.5px),
+    radial-gradient(#e2e8f0 1.5px, #f1f5f9 1.5px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* OpenStreetMap Dark Mode: Filtro oscuro exclusivo para las teselas base del mapa */
+.dark .leaflet-tile-pane {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}

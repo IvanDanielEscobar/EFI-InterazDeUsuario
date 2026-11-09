@@ -1,0 +1,78 @@
+{
+  "project": {
+    "name": "Radar Urbano (Red Vecinal de Prevención)",
+    "description": "Single Page Application (SPA) colaborativa, Mobile-First y accesible desarrollada en React + Vite y Tailwind CSS v3, integrada con Google Maps JavaScript API para Río Cuarto, con botón de pánico SOS de 1.5s, gamificación comunitaria y persistencia en localStorage.",
+    "version": "1.0.0",
+    "updated_at": "2026-11-08T21:35:00-03:00"
+  },
+  "operating_system": "Gentle-AI Protocol (Senior Product Engineer)",
+  "stack": {
+    "framework": "React 18 + Vite",
+    "styles": "Tailwind CSS v3 + CSS Variables",
+    "map_api": "Leaflet.js + OpenStreetMap HOT (Proveedor Único sin API Keys)",
+    "icons": "Lucide React + SVG semánticos nativos",
+    "storage": "LocalStorage API"
+  },
+  "personas": [
+    {
+      "name": "Camila (Estudiante universitaria, 21 años)",
+      "profile": "Estudiante de la UNRC que regresa de noche en colectivo y caminando",
+      "pain_points": [
+        "Miedo ante calles desiertas o paradas a oscuras",
+        "Imposibilidad de completar formularios largos mientras camina apresurada"
+      ],
+      "ux_solutions": [
+        "Botón de Pánico flotante gigante al alcance del pulgar (Ley de Fitts)",
+        "Feedback háptico inmediato (navigator.vibrate) y confirmación visual clara"
+      ]
+    },
+    {
+      "name": "Don Roberto (Vecino / Comerciante, 52 años)",
+      "profile": "Residente y comerciante barrial de Río Cuarto que reporta problemas durante el día",
+      "pain_points": [
+        "Interfaces sobrecargadas o jerga técnica",
+        "Duda de si su reporte fue enviado y tomado en cuenta"
+      ],
+      "ux_solutions": [
+        "Tipografía legible Albert Sans en escala adecuada (16px a 32px)",
+        "Confirmación visual con modal y mensaje de agradecimiento comunitario"
+      ]
+    },
+    {
+      "name": "Ignacio (Usuario con mano hábil izquierda)",
+      "profile": "Usuario zurdo que navega su teléfono con la mano izquierda",
+      "pain_points": [
+        "Botón de pánico o acciones críticas fuera del alcance del pulgar izquierdo"
+      ],
+      "ux_solutions": [
+        "Botón Flotante de Pánico (FAB) con switch ergonómico para posicionarse a la izquierda"
+      ]
+    }
+  ],
+  "adrs": [
+    "ADR-011: Adopción de React + Vite + Tailwind CSS para SPA Radar Urbano",
+    "ADR-012: Integración de Google Maps JavaScript API con Toque Directo y Contingencia",
+    "ADR-013: Layout Híbrido Adaptativo (Mobile-First en Móvil + Sidebar en Desktop)",
+    "ADR-014: Activación de SOS con Presión Sostenida (1.5s - 2s) y Ergonomía Zurda",
+    "ADR-015: Flujo Completo de las 42 Pantallas de Figma con Persistencia Local",
+    "ADR-016: Cartografía Interactiva con Leaflet y Rol de CARTO MCP",
+    "ADR-017: Motor Cartográfico Híbrido Resiliente (Google Maps + Fallback)",
+    "ADR-018: Erradicación de Mosaicos CARTO e Integración de Esri Dark Gray + OpenStreetMap HOT",
+    "ADR-019: Estandarización en Proveedor Único OpenStreetMap y Eliminación de Código Muerto",
+    "ADR-020: Desacoplamiento de Comercios del Mapa y Centralización en Canje de Puntos",
+    "ADR-021: Dock Segmentado Unificado: Referencias + Agregar Alerta",
+    "ADR-022: Armonización de Alturas y Geometría en el Dock Inferior",
+    "ADR-023: Vistas Dedicadas Modales y Barra de Navegación Horizontal en Escritorio",
+    "ADR-024: Sistema de 5 Usuarios Hardcodeados, Iniciales en Avatar y Rol de Moderación Activa",
+    "ADR-025: Diferenciación Visual en Mapa para Reportes Solucionados (Fondo Gris y Tilde Verde)",
+    "ADR-026: Delimitación Geográfica de Reportes Activos con Radio de 1 km por Defecto y Configurable",
+    "ADR-027: Simulación Urbana Realista: Expansión a 23 Reportes en Río Cuarto con ~40% Resueltos",
+    "ADR-028: Calibración del Radio Predeterminado de Alertas Activas a 5 km",
+    "ADR-029: Remoción de Accesos Rápidos en Login y Formulario Completo de Registro Vecinal",
+    "ADR-030: Radio Geodésico Predeterminado Diferenciado por Rol: Moderador (5 km) y Vecinos (1 km)",
+    "ADR-031: Centrado Horizontal Equilibrado del Contenedor de Notificaciones Toast",
+    "ADR-032: Remoción del Recuadro de Cuentas Disponibles en Login",
+    "ADR-033: Blindaje Anti-Autofill del Navegador en Login y Registro",
+    "ADR-034: Estandarización de Alturas y Geometría en la Barra de Navegación (Navbar)"
+  ]
+}
