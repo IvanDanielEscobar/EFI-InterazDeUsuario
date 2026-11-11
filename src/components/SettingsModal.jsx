@@ -35,7 +35,6 @@ export default function SettingsModal() {
     defaultAlertRadius,
     toggleTheme,
     toggleLeftHanded,
-    setPinShape,
     setAlertRadius,
     setActiveNeighborhood,
     resetDemoData
@@ -180,8 +179,10 @@ export default function SettingsModal() {
             {/* Modo para Zurdos */}
             <div className="flex items-center justify-between bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700">
               <div>
-                <p className="font-bold text-xs text-white">Modo para Zurdos (Ignacio)</p>
-                <p className="text-[11px] text-slate-400">Invierte el dock inferior y ubica el Botón SOS a la izquierda</p>
+                <p className="font-bold text-xs text-white">Modo para Zurdos</p>
+                <p className="text-[11px] text-slate-400">
+                  Ubica el Botón SOS a la izquierda e invierte los segmentos de Referencias y Alertas
+                </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -194,32 +195,44 @@ export default function SettingsModal() {
               </label>
             </div>
 
-            {/* Formas de Pines para Daltonismo */}
+            {/* Simbología Semántica de Pines por Categoría (WCAG AA / Daltonismo) */}
             <div className="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700 space-y-2">
-              <div>
-                <p className="font-bold text-xs text-white">Geometría de Pines (WCAG / Daltonismo)</p>
-                <p className="text-[11px] text-slate-400">Facilita el reconocimiento visual sin depender únicamente del color</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-xs text-white">Simbología Semántica de Pines</p>
+                  <p className="text-[11px] text-slate-400">
+                    Forma única asignada por categoría para personas con dificultades visuales
+                  </p>
+                </div>
+                <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold shrink-0">
+                  WCAG AA
+                </span>
               </div>
-              <div className="grid grid-cols-3 gap-2 pt-1">
-                {[
-                  { id: 'circle', label: 'Círculo', shape: '●' },
-                  { id: 'square', label: 'Cuadrado', shape: '■' },
-                  { id: 'triangle', label: 'Triángulo', shape: '▲' }
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setPinShape(item.id)}
-                    className={`btn-interactive flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                      config.pinShape === item.id
-                        ? 'bg-amber-400/20 text-amber-300 border-amber-400 ring-2 ring-amber-400/30'
-                        : 'bg-slate-900/60 text-slate-300 border-slate-700 hover:border-slate-600'
-                    }`}
-                  >
-                    <span className="text-sm">{item.shape}</span>
-                    <span>{item.label}</span>
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pt-1 text-[11px] text-slate-300">
+                <div className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-700/60">
+                  <span className="w-2.5 h-2.5 bg-red-600 rotate-45 shrink-0 inline-block border border-white/60"></span>
+                  <span className="truncate">Rombo (Delito)</span>
+                </div>
+                <div className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-700/60">
+                  <span className="w-2.5 h-2.5 bg-orange-500 rounded-xs shrink-0 inline-block border border-white/60"></span>
+                  <span className="truncate">Cuadrado (Sospechoso)</span>
+                </div>
+                <div className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-700/60">
+                  <span className="w-2.5 h-2.5 bg-amber-500 rounded-full shrink-0 inline-block border border-white/60"></span>
+                  <span className="truncate">Círculo (Luz)</span>
+                </div>
+                <div className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-700/60">
+                  <span className="w-2.5 h-2.5 bg-sky-500 rounded-t-full rounded-b-xs shrink-0 inline-block border border-white/60"></span>
+                  <span className="truncate">Pin (Baldío)</span>
+                </div>
+                <div className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-700/60">
+                  <span className="w-0 h-0 border-x-[5px] border-x-transparent border-b-[9px] border-b-violet-500 shrink-0 inline-block"></span>
+                  <span className="truncate">Triángulo (Acoso)</span>
+                </div>
+                <div className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-700/60">
+                  <span className="w-3 h-3 rounded-sm bg-slate-600 text-emerald-400 font-black text-[9px] flex items-center justify-center shrink-0 border border-slate-400">✓</span>
+                  <span className="truncate">Hexágono (Resuelto)</span>
+                </div>
               </div>
             </div>
 

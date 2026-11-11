@@ -10,7 +10,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   Save,
-  RotateCcw
+  RotateCcw,
+  UserX
 } from 'lucide-react';
 import { CATEGORIES_CONFIG } from '../data/initialReports';
 
@@ -275,11 +276,20 @@ export default function PinDetailsModal() {
             <div className="flex items-center gap-2 text-xs text-slate-400 mb-2 flex-wrap">
               <span>{selectedReport.time}</span>
               <span>•</span>
-              <span className="font-semibold text-slate-300">{selectedReport.author}</span>
-              {selectedReport.authorTier && (
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getTierClass(selectedReport.authorTier)}`}>
-                  {selectedReport.authorTier.toUpperCase()}
+              {selectedReport.isAnonymous ? (
+                <span className="flex items-center gap-1 font-semibold text-amber-300">
+                  <UserX className="w-3.5 h-3.5" />
+                  <span>Vecino Anónimo</span>
                 </span>
+              ) : (
+                <>
+                  <span className="font-semibold text-slate-300">{selectedReport.author}</span>
+                  {selectedReport.authorTier && (
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getTierClass(selectedReport.authorTier)}`}>
+                      {selectedReport.authorTier.toUpperCase()}
+                    </span>
+                  )}
+                </>
               )}
               <span>•</span>
               <span className={`text-[11px] font-bold flex items-center gap-1 ${

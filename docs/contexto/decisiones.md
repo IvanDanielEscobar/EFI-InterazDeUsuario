@@ -370,3 +370,79 @@ Este documento es una bitácora cronológica con Fecha y Hora de todas las decis
        - Todos los botones con altura idéntica `h-8 px-3 rounded-xl` y alineación vertical estricta.
        - Insignia de puntos ajustada a `h-4.5` sin alterar la altura del botón contenedor.
 - **Consecuencias**: Alineación visual armónica, simetría perfecta en el eje vertical y coherencia geométrica en toda la barra de navegación tanto en móvil como en escritorio.
+
+---
+
+### [ADR-035] · [2026-11-09 01:10] Simbología Geométrica Universal por Categoría (WCAG AA 1.4.1) y Limpieza de Modo para Zurdos
+- **Contexto**:
+  1. En el panel de ajustes, la opción de ergonomía "Modo para Zurdos" incluía la referencia "(Ignacio)", la cual debía ser removida para presentar la opción de manera neutra y universal.
+  2. La forma de los pines en el mapa dependía anteriormente de un selector manual global del usuario. El nuevo requerimiento de accesibilidad y de negocio establece que **cada tipo de alerta posea de forma intrínseca una geometría vectorial única**:
+     - **Robo / Delito**: Rombo / Diamante (`diamond`) en rojo (`#dc2626`).
+     - **Persona sospechosa**: Cuadrado (`square`) en naranja (`#f97316`).
+     - **Iluminación rota**: Círculo (`circle`) en ámbar (`#f59e0b`).
+     - **Baldío peligroso**: Gota / Pin (`pin`) en azul cielo (`#0ea5e9`).
+     - **Acoso / Violencia**: Triángulo (`triangle`) en violeta (`#8b5cf6`).
+     - **Infraestructura**: Octágono (`octagon`) en azul (`#3b82f6`).
+     - **Resuelto / Solucionado**: Hexágono (`hexagon`) en gris pizarra (`#64748b`) con pastilla verde y checkmark (`✓`).
+  3. Esta diferenciación geométrica garantiza el cumplimiento de **WCAG AA 1.4.1 (Uso del color)**, permitiendo que personas con daltonismo (protanopia, deuteranopia, tritanopia) o dificultades visuales reconozcan el incidente de inmediato por su silueta.
+- **Decisión**:
+  1. En [`src/data/initialReports.js`](file:///home/iescobar/itec/3ero/ui/efi/src/data/initialReports.js): Extender `CATEGORIES_CONFIG` asociando `shape` y `shapeLabel` a cada categoría.
+  2. En [`src/components/SettingsModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/SettingsModal.jsx):
+     - Simplificar el título a "Modo para Zurdos".
+     - Eliminar el selector manual de `pinShape` y reemplazarlo por un visor informativo de Simbología Semántica WCAG AA.
+  3. En [`src/components/MapCanvas.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/MapCanvas.jsx):
+     - Renderizar marcadores SVG con la silueta geométrica correspondiente a cada categoría y hexágono para resueltos.
+     - Actualizar el popover de "Referencias" para mostrar las siluetas vectoriales de cada categoría junto a su nombre limpio y conciso, manteniendo la leyenda detallada de formas en el panel de Configuraciones.
+     - Remover `config.pinShape` del ciclo de renderizado de marcadores.
+  4. En [`src/components/BottomSheetReport.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/BottomSheetReport.jsx): Exponer la forma asociada en cada categoría del formulario de reporte.
+- **Consecuencias**: Plena accesibilidad universal sin depender exclusivamente del color, lectura espacial inmediata de incidentes y código desacoplado y robusto.
+
+---
+
+### [ADR-036] · [2026-11-09 01:25] Diferenciación Cromática, Espaciado Generoso y Filtrado por Categoría en Historial
+- **Contexto**:
+  1. En el modal de Historial ([`HistoryModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/HistoryModal.jsx)), las tarjetas aparecían agrupadas en una lista densa con divisores planos (`divide-y`), careciendo de identidad visual individual y de suficiente separación espacial.
+  2. El usuario solicitó dos mejoras centrales:
+     - Diferenciar cada tarjeta dándole más espacio y un fondo con tono similar al color semántico del reporte.
+     - Incorporar la capacidad de filtrar el historial por categoría específica (ej. ver solo Robo / Delito, Iluminación rota, etc.).
+- **Decisión**:
+  1. En [`src/components/HistoryModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/HistoryModal.jsx):
+     - **Espaciado y Geometría de Cards**: Se removió el divisor plano `divide-y` y se amplió la separación a `space-y-4` con padding interior `p-4 sm:p-5`, elevación mediante sombras (`shadow-md hover:shadow-xl`) y bordes redondeados amplios (`rounded-2xl`).
+     - **Tematización Cromática por Categoría**: Se definió un diccionario de estilos `CATEGORY_CARD_STYLES` que aplica a cada tarjeta un sutil degradado oscuro con el color del reporte (ej. `from-red-950/45` para delito, `from-orange-950/45` para sospechoso, `from-amber-950/45` para luz), sumado a un **borde de acento izquierdo grueso (`border-l-4`)** para identificación inmediata a simple vista. Los reportes solucionados reciben un tratamiento archivado con `border-l-emerald-500/80` y badge verde.
+     - **Filtro Horizontal por Categoría**: Se añadió una barra de pastillas interactivas horizontales con desplazamiento suave (`overflow-x-auto`) que permite filtrar por cada una de las 6 categorías o ver "Todas". Cada chip exhibe su silueta geométrica correspondiente (Rombo, Cuadrado, Círculo, etc.) y un contador reactivo de incidentes en tiempo real.
+     - **Estado Vacío Amigable**: Se integró un contenedor con ícono y botón de acción directa ("Restablecer filtros") cuando un filtro no produce resultados.
+- **Consecuencias**: Auditoría barrial sumamente ágil e intuitiva, contraste garantizado (> 12:1 sobre texto blanco) y navegación accesible con teclado en todos los estados.
+
+---
+
+### [ADR-037] · [2026-11-09 01:40] Publicación de Reportes Anónimos y Carga de Evidencia Fotográfica
+- **Contexto**:
+  1. En situaciones delictivas de riesgo o comprometedoras (robos violentos, venta de estupefacientes, violencia o acoso), los vecinos expresaban el temor fundado a sufrir represalias si su nombre completo o perfil vecinal quedaban expuestos en el mapa comunitario.
+  2. Al mismo tiempo, se requería la posibilidad de adjuntar evidencia fotográfica directa (desde la cámara o galería del dispositivo) dentro del formulario de reporte para validar la veracidad y alcance del incidente.
+- **Decisión**:
+  1. En [`src/context/AppContext.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/context/AppContext.jsx):
+     - Incorporar los estados `isAnonymous` y `reportPhoto`.
+     - Al confirmar el reporte, si `isAnonymous` es verdadero, registrar públicamente al autor como `"Vecino Anónimo"` y anular el `authorTier`.
+     - Preservar internamente `authorId: user?.id` para que el autor continúe visualizando su propia alerta dentro de su pestaña personal *"Mis Reportes"*, sin que terceros puedan asociarla a su identidad.
+  2. En [`src/components/BottomSheetReport.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/BottomSheetReport.jsx):
+     - **Interruptor de Modo Anónimo**: Switch ergonómico accesible con indicador "Protegido", que informa con claridad que los datos personales no serán divulgados.
+     - **Carga y Compresión de Imagen**: Input de archivo nativo (`<input type="file" accept="image/*">`) con compresión automática mediante Canvas HTML5 (redimensionado a max 800px a 0.82 de calidad JPEG) para garantizar persistencia liviana y veloz en `localStorage`. Previsualización interactiva con botón para cambiar o eliminar la foto, y opciones de muestra rápida para pruebas de demostración.
+  3. En [`src/components/ConfirmationModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/ConfirmationModal.jsx), [`src/components/PinDetailsModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/PinDetailsModal.jsx) y [`src/components/HistoryModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/HistoryModal.jsx):
+     - Reflejar coherentemente la condición anónima con el badge de *"Vecino Anónimo"* y exhibir la fotografía adjunta con diseño responsive.
+  4. En [`src/components/FaqModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/FaqModal.jsx):
+     - Incorporar en la sección *"Términos y Privacidad de Datos"* la política de protección y uso de los reportes y denuncias anónimas.
+- **Consecuencias**: Seguridad ciudadana y privacidad integral garantizada ante situaciones de riesgo personal, y soporte confiable de evidencia fotográfica sin saturar el almacenamiento local.
+
+---
+
+### [ADR-038] · [2026-11-09 01:55] Inversión Ergonómica Integral en Modo para Zurdos (Dock y Segmentos de Referencias/Alertas)
+- **Contexto**:
+  1. Al activar el "Modo para Zurdos", el dock inferior invertía la posición del Botón SOS (hacia la izquierda) y de la pastilla unificada (hacia la derecha).
+  2. No obstante, los botones interiores de la pastilla permanecían fijos en `[Referencias | Agregar Alerta]`. Para una ergonomía táctil óptima del pulgar izquierdo (Ley de Fitts), los segmentos internos debían también invertirse para situar la acción primaria más cercana al eje de navegación.
+- **Decisión**:
+  1. En [`src/components/MapCanvas.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/MapCanvas.jsx):
+     - Aplicar clase condicional `config.isLeftHanded ? 'flex-row-reverse' : 'flex-row'` al contenedor interno de la pastilla segmentada, invirtiendo el orden de "Referencias" y "Agregar Alerta".
+     - El popover de Referencias se alinea con precisión a `right-0` directamente sobre el botón de Referencias.
+  2. En [`src/components/SettingsModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/SettingsModal.jsx):
+     - Actualizar la descripción para clarificar la inversión integral tanto del dock como de los botones internos.
+- **Consecuencias**: Ergonomía táctil superior, simetría perfecta y mayor facilidad de uso con una sola mano izquierda.

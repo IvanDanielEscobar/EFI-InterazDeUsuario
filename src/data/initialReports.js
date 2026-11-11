@@ -518,12 +518,12 @@ export const INITIAL_REPORTS = [
 ];
 
 export const CATEGORIES_CONFIG = {
-  delito: { name: 'Robo / Delito', color: '#dc2626', bg: 'bg-red-600', icon: 'triangle' },
-  sospechoso: { name: 'Persona sospechosa', color: '#f97316', bg: 'bg-orange-500', icon: 'eye' },
-  luz: { name: 'Iluminación rota', color: '#f59e0b', bg: 'bg-amber-500', icon: 'bulb' },
-  baldio: { name: 'Terreno Baldío', color: '#0ea5e9', bg: 'bg-sky-500', icon: 'fence' },
-  acoso: { name: 'Acoso / Violencia', color: '#8b5cf6', bg: 'bg-violet-500', icon: 'alert' },
-  infra: { name: 'Infraestructura', color: '#3b82f6', bg: 'bg-blue-500', icon: 'gear' }
+  delito: { name: 'Robo / Delito', color: '#dc2626', bg: 'bg-red-600', icon: 'triangle', shape: 'diamond', shapeLabel: 'Rombo' },
+  sospechoso: { name: 'Persona sospechosa', color: '#f97316', bg: 'bg-orange-500', icon: 'eye', shape: 'square', shapeLabel: 'Cuadrado' },
+  luz: { name: 'Iluminación rota', color: '#f59e0b', bg: 'bg-amber-500', icon: 'bulb', shape: 'circle', shapeLabel: 'Círculo' },
+  baldio: { name: 'Terreno Baldío', color: '#0ea5e9', bg: 'bg-sky-500', icon: 'fence', shape: 'pin', shapeLabel: 'Pin' },
+  acoso: { name: 'Acoso / Violencia', color: '#8b5cf6', bg: 'bg-violet-500', icon: 'alert', shape: 'triangle', shapeLabel: 'Triángulo' },
+  infra: { name: 'Infraestructura', color: '#3b82f6', bg: 'bg-blue-500', icon: 'gear', shape: 'octagon', shapeLabel: 'Octágono' }
 };
 
 export const PARTNER_STORES = [

@@ -123,6 +123,8 @@ export function AppProvider({ children }) {
   const [pendingLocation, setPendingLocation] = useState({ lat: -33.125, lng: -64.350, x: 50, y: 50 });
   const [selectedCategory, setSelectedCategory] = useState('delito');
   const [reportDescription, setReportDescription] = useState('');
+  const [reportPhoto, setReportPhoto] = useState('');
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [centerTrigger, setCenterTrigger] = useState(0);
   const [focusLocationTrigger, setFocusLocationTrigger] = useState(null);
 
@@ -246,6 +248,9 @@ export function AppProvider({ children }) {
   // Acciones de Reportes
   const startReportAtLocation = ({ lat, lng, x, y }) => {
     setPendingLocation({ lat, lng, x, y });
+    setReportDescription('');
+    setReportPhoto('');
+    setIsAnonymous(false);
     setActiveModal('report');
     triggerHaptic([50]);
   };
@@ -260,6 +265,9 @@ export function AppProvider({ children }) {
 
   const confirmAndPublishReport = () => {
     const cat = CATEGORIES_CONFIG[selectedCategory] || CATEGORIES_CONFIG.delito;
+    const authorName = isAnonymous ? 'Vecino Anónimo' : user.name;
+    const authorTier = isAnonymous ? null : user.tier;
+
     const newReport = {
       id: Date.now(),
       type: selectedCategory,
@@ -276,20 +284,29 @@ export function AppProvider({ children }) {
       badgeBg: cat.bg,
       reactions: 1,
       hasReacted: true,
-      author: user.name,
-      authorTier: user.tier,
-      photo: '',
+      author: authorName,
+      authorId: user?.id,
+      authorTier: authorTier,
+      isAnonymous: Boolean(isAnonymous),
+      photo: reportPhoto || '',
       comments: []
     };
 
     setReports((prev) => [newReport, ...prev]);
     setReportDescription('');
+    setReportPhoto('');
+    setIsAnonymous(false);
     setActiveModal('success');
     triggerHaptic([120, 80, 120]);
 
     setTimeout(() => {
       setActiveModal(null);
-      showToast('¡Reporte publicado con éxito en la red vecinal!', 'success');
+      showToast(
+        isAnonymous
+          ? '¡Reporte publicado de forma anónima en la red vecinal!'
+          : '¡Reporte publicado con éxito en la red vecinal!',
+        'success'
+      );
     }, 2200);
   };
 
@@ -635,6 +652,10 @@ export function AppProvider({ children }) {
         setSelectedCategory,
         reportDescription,
         setReportDescription,
+        reportPhoto,
+        setReportPhoto,
+        isAnonymous,
+        setIsAnonymous,
         toasts,
         showToast,
         triggerHaptic,

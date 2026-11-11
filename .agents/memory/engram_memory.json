@@ -73,6 +73,10 @@
     "ADR-031: Centrado Horizontal Equilibrado del Contenedor de Notificaciones Toast",
     "ADR-032: Remoción del Recuadro de Cuentas Disponibles en Login",
     "ADR-033: Blindaje Anti-Autofill del Navegador en Login y Registro",
-    "ADR-034: Estandarización de Alturas y Geometría en la Barra de Navegación (Navbar)"
+    "ADR-034: Estandarización de Alturas y Geometría en la Barra de Navegación (Navbar)",
+    "ADR-035: Simbología Geométrica Universal por Categoría (WCAG AA 1.4.1) y Limpieza de Modo para Zurdos",
+    "ADR-036: Diferenciación Cromática, Espaciado Generoso y Filtrado por Categoría en Historial",
+    "ADR-037: Publicación de Reportes Anónimos y Carga de Evidencia Fotográfica",
+    "ADR-038: Inversión Ergonómica Integral en Modo para Zurdos (Dock y Segmentos de Referencias/Alertas)"
   ]
 }
