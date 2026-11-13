@@ -80,7 +80,7 @@ export default function PanicButton() {
         onMouseLeave={cancelPress}
         onTouchStart={startPress}
         onTouchEnd={cancelPress}
-        className="btn-interactive relative w-[54px] h-[54px] sm:w-[58px] sm:h-[58px] rounded-full aspect-square bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-600 hover:to-red-800 active:scale-95 text-white flex flex-col items-center justify-center border-2 border-white/90 dark:border-slate-800 shadow-xl sos-button-glow focus-visible:outline-none"
+        className="btn-interactive force-text-white relative w-[54px] h-[54px] sm:w-[58px] sm:h-[58px] rounded-full aspect-square bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-600 hover:to-red-800 active:scale-95 text-white flex flex-col items-center justify-center border-2 border-white/90 dark:border-slate-800 shadow-xl sos-button-glow focus-visible:outline-none"
         aria-label="Botón de Pánico SOS. Mantén presionado 1.5 segundos para solicitar auxilio inmediato."
       >
         {/* Onda expansiva de radar circular suave */}

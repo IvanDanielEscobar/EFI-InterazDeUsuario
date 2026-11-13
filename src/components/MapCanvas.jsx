@@ -511,7 +511,7 @@ export default function MapCanvas() {
                   y: 50
                 });
               }}
-              className="btn-interactive h-full flex items-center gap-1.5 px-3.5 sm:px-4 hover:bg-slate-800/80 active:bg-slate-800 text-white font-extrabold text-xs sm:text-sm transition-all focus-visible:outline-none whitespace-nowrap"
+              className="btn-interactive force-text-white h-full flex items-center gap-1.5 px-3.5 sm:px-4 hover:bg-slate-800/80 active:bg-slate-800 text-white font-extrabold text-xs sm:text-sm transition-all focus-visible:outline-none whitespace-nowrap"
               aria-label="Iniciar reporte de nueva alerta"
             >
               <Plus className="w-4 h-4 text-emerald-400 stroke-[3] shrink-0" />
