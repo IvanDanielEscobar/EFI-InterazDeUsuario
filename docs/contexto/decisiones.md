@@ -446,3 +446,24 @@ Este documento es una bitácora cronológica con Fecha y Hora de todas las decis
   2. En [`src/components/SettingsModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/SettingsModal.jsx):
      - Actualizar la descripción para clarificar la inversión integral tanto del dock como de los botones internos.
 - **Consecuencias**: Ergonomía táctil superior, simetría perfecta y mayor facilidad de uso con una sola mano izquierda.
+
+---
+
+### [ADR-039] · [2026-11-10 22:15] Restricción de Visibilidad y Guardas de Autenticación para Invitados
+- **Contexto**:
+  1. Opciones ligadas al perfil de usuario (`Historial`, `Puntos y Canje`, `Datos Personales`, `Configuración`) solo tienen sentido cuando el usuario ha iniciado sesión. Los usuarios no autenticados (invitados / `!user.isLoggedIn`) no deben ver estas opciones ni en la barra de navegación de escritorio ni en el menú lateral móvil.
+  2. Al mismo tiempo, acciones clave accesibles en el mapa interactivo (como el botón "Agregar Alerta", el clic en una calle para reportar o el botón de pánico "SOS") deben interceptar al invitado, orientarlo mediante una notificación toast explicativa y redirigirlo inmediatamente al modal de inicio de sesión (`auth` en vista `login`).
+- **Decisión**:
+  1. En [`src/components/Header.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/Header.jsx):
+     - Condicionar la barra horizontal de navegación `<nav>` con `{user?.isLoggedIn && (...) }`, eliminando del encabezado para invitados todas las opciones vinculadas a usuario (`Historial`, `Puntos`, `Datos Personales`, `Configuración`).
+  2. En [`src/components/DrawerMenu.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/DrawerMenu.jsx):
+     - En la sección no logueada, remover `Historial de reportes`, `Comercios y Canje de puntos` y `Configuración`, conservando únicamente *"Iniciar Sesión / Registrarse"* y *"Preguntas frecuentes"*.
+  3. En [`src/components/PanicButton.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/PanicButton.jsx):
+     - Validar `!user?.isLoggedIn` en `startPress`, `completeEmergency` y `onClick`. Si el usuario no está logueado, se cancela la emisión, se reproduce respuesta háptica de advertencia, se abre el modal de login y se emite el toast: *"Debes iniciar sesión para activar el botón SOS de auxilio"*.
+  4. En [`src/components/MapCanvas.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/MapCanvas.jsx) y [`src/context/AppContext.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/context/AppContext.jsx):
+     - Blindar el botón "Agregar Alerta" y el clic sobre calles (`startReportAtLocation`), redirigiendo a login con el toast: *"Debes iniciar sesión para reportar una alerta"*.
+     - Proteger `setActiveModal` contra aperturas forzadas de modales privados (`PROTECTED_MODALS: ['history', 'points', 'personalData', 'settings', 'report', 'confirm', 'sos']`).
+     - Proteger interacciones sociales y de resolución (`toggleReaction`, `addComment`, etc.) para usuarios no autenticados.
+  5. En [`src/App.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/App.jsx):
+     - En el subheader, renderizar el botón interactivo de ajuste de distancia solo si `user?.isLoggedIn`, exhibiendo texto plano informativo cuando es invitado.
+- **Consecuencias**: Seguridad de datos, diferenciación nítida entre experiencia de invitado y vecino autenticado, y navegación fluida orientada a la conversión de usuarios hacia el login.

@@ -37,14 +37,20 @@ export default function App() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setActiveModal('settings')}
-            className="btn-interactive text-[11px] text-amber-600 dark:text-amber-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-            title="Ajustar radio de distancia en configuraciones"
-          >
-            <span>Radio: {alertRadiusKm} km</span>
-          </button>
+          {user?.isLoggedIn ? (
+            <button
+              type="button"
+              onClick={() => setActiveModal('settings')}
+              className="btn-interactive text-[11px] text-amber-600 dark:text-amber-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+              title="Ajustar radio de distancia en configuraciones"
+            >
+              <span>Radio: {alertRadiusKm} km</span>
+            </button>
+          ) : (
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+              Radio: {alertRadiusKm} km
+            </span>
+          )}
           <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold hidden sm:inline">
             • En vivo
           </span>

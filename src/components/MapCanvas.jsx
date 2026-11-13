@@ -19,7 +19,9 @@ export default function MapCanvas() {
     showToast,
     triggerHaptic,
     centerTrigger,
-    focusLocationTrigger
+    focusLocationTrigger,
+    user,
+    setAuthView
   } = useApp();
 
   const mapContainerRef = useRef(null);
@@ -495,6 +497,13 @@ export default function MapCanvas() {
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                if (!user?.isLoggedIn) {
+                  triggerHaptic([60, 40]);
+                  setAuthView('login');
+                  setActiveModal('auth');
+                  showToast('Debes iniciar sesión para reportar una alerta', 'warning');
+                  return;
+                }
                 startReportAtLocation({
                   lat: RIO_CUARTO_CENTER[0],
                   lng: RIO_CUARTO_CENTER[1],

@@ -151,7 +151,7 @@ export default function DrawerMenu() {
             </button>
           </div>
         ) : (
-          /* SECCIÓN NO LOGUEADO (Página 42 de Figma) */
+          /* SECCIÓN NO LOGUEADO: Solo acciones generales (Login/Registro y Preguntas frecuentes) */
           <div className="flex flex-col">
             <button
               type="button"
@@ -165,42 +165,6 @@ export default function DrawerMenu() {
             </button>
 
             <nav className="space-y-1 text-sm font-semibold text-slate-200">
-              <button
-                type="button"
-                onClick={() => setActiveModal('history')}
-                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between transition-all"
-              >
-                <div className="flex items-center gap-2.5">
-                  <FileText className="w-4 h-4 text-slate-400" />
-                  <span>Historial de reportes</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveModal('points')}
-                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Gift className="w-4 h-4 text-amber-400" />
-                  <span>Comercios y Canje de puntos</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveModal('settings')}
-                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Settings className="w-4 h-4 text-slate-400" />
-                  <span>Configuración</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              </button>
-
               <button
                 type="button"
                 onClick={() => setActiveModal('faq')}

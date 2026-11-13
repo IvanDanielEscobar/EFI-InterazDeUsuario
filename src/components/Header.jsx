@@ -45,84 +45,86 @@ export default function Header() {
         </button>
       </div>
 
-      {/* 2. Barra de Navegación Horizontal Exclusiva para Desktop (Pestañas unificadas en altura h-8) */}
-      <nav
-        className="hidden md:flex items-center gap-1 bg-slate-800/80 p-1 rounded-2xl border border-slate-700/80 shadow-inner h-10 shrink-0"
-        aria-label="Navegación principal de escritorio"
-      >
-        <button
-          type="button"
-          onClick={() => setActiveModal(null)}
-          className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
-            activeModal === null
-              ? 'bg-amber-400 text-slate-950 shadow-sm'
-              : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
-          }`}
-          aria-current={activeModal === null ? 'page' : undefined}
+      {/* 2. Barra de Navegación Horizontal Exclusiva para Desktop (Solo visible para usuarios autenticados) */}
+      {user?.isLoggedIn && (
+        <nav
+          className="hidden md:flex items-center gap-1 bg-slate-800/80 p-1 rounded-2xl border border-slate-700/80 shadow-inner h-10 shrink-0"
+          aria-label="Navegación principal de escritorio"
         >
-          <Map className="w-3.5 h-3.5" />
-          <span>Mapa</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveModal(null)}
+            className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
+              activeModal === null
+                ? 'bg-amber-400 text-slate-950 shadow-sm'
+                : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+            }`}
+            aria-current={activeModal === null ? 'page' : undefined}
+          >
+            <Map className="w-3.5 h-3.5" />
+            <span>Mapa</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveModal('history')}
-          className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
-            activeModal === 'history'
-              ? 'bg-amber-400 text-slate-950 shadow-sm'
-              : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
-          }`}
-          aria-current={activeModal === 'history' ? 'page' : undefined}
-        >
-          <Clock className="w-3.5 h-3.5" />
-          <span>Historial</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveModal('history')}
+            className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
+              activeModal === 'history'
+                ? 'bg-amber-400 text-slate-950 shadow-sm'
+                : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+            }`}
+            aria-current={activeModal === 'history' ? 'page' : undefined}
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>Historial</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveModal('points')}
-          className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
-            activeModal === 'points'
-              ? 'bg-amber-400 text-slate-950 shadow-sm'
-              : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
-          }`}
-          aria-current={activeModal === 'points' ? 'page' : undefined}
-        >
-          <Gift className="w-3.5 h-3.5" />
-          <span>Puntos</span>
-          <span className="text-[10px] font-black h-4.5 px-1.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30 inline-flex items-center justify-center leading-none">
-            {user.points}
-          </span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveModal('points')}
+            className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
+              activeModal === 'points'
+                ? 'bg-amber-400 text-slate-950 shadow-sm'
+                : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+            }`}
+            aria-current={activeModal === 'points' ? 'page' : undefined}
+          >
+            <Gift className="w-3.5 h-3.5" />
+            <span>Puntos</span>
+            <span className="text-[10px] font-black h-4.5 px-1.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30 inline-flex items-center justify-center leading-none">
+              {user.points}
+            </span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveModal('personalData')}
-          className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
-            activeModal === 'personalData'
-              ? 'bg-amber-400 text-slate-950 shadow-sm'
-              : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
-          }`}
-          aria-current={activeModal === 'personalData' ? 'page' : undefined}
-        >
-          <User className="w-3.5 h-3.5" />
-          <span>Datos Personales</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveModal('personalData')}
+            className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
+              activeModal === 'personalData'
+                ? 'bg-amber-400 text-slate-950 shadow-sm'
+                : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+            }`}
+            aria-current={activeModal === 'personalData' ? 'page' : undefined}
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Datos Personales</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveModal('settings')}
-          className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
-            activeModal === 'settings'
-              ? 'bg-amber-400 text-slate-950 shadow-sm'
-              : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
-          }`}
-          aria-current={activeModal === 'settings' ? 'page' : undefined}
-        >
-          <Sliders className="w-3.5 h-3.5" />
-          <span>Configuración</span>
-        </button>
-      </nav>
+          <button
+            type="button"
+            onClick={() => setActiveModal('settings')}
+            className={`btn-interactive h-8 px-3 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer ${
+              activeModal === 'settings'
+                ? 'bg-amber-400 text-slate-950 shadow-sm'
+                : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+            }`}
+            aria-current={activeModal === 'settings' ? 'page' : undefined}
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>Configuración</span>
+          </button>
+        </nav>
+      )}
 
       {/* 3. Acciones de Utilidad (Todos calibrados a altura fija h-9 / 36px) */}
       <div className="flex items-center gap-2 shrink-0">

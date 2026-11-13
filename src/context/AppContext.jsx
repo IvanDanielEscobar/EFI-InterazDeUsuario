@@ -47,15 +47,19 @@ export function AppProvider({ children }) {
     }
   });
 
-  // 2. Estado de Usuario (Carga uno de los 5 usuarios hardcodeados sin 'Fulano')
+  // 2. Estado de Usuario (Carga uno de los 5 usuarios hardcodeados con isLoggedIn explícito)
   const [user, setUser] = useState(() => {
-    const fallbackUser = HARDCODED_USERS[0];
+    const fallbackUser = { ...HARDCODED_USERS[0], isLoggedIn: false };
     try {
       const saved = localStorage.getItem('radar_urbano_user');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.name && parsed.name !== 'Fulano') {
-          return { ...fallbackUser, ...parsed };
+          return {
+            ...fallbackUser,
+            ...parsed,
+            isLoggedIn: Boolean(parsed.isLoggedIn)
+          };
         }
       }
       return fallbackUser;
@@ -114,10 +118,22 @@ export function AppProvider({ children }) {
   // 4. Filtro activo
   const [activeFilter, setActiveFilter] = useState('todos');
 
-  // 5. Modales y Vistas Activas
-  const [activeModal, setActiveModal] = useState(null); // 'report'|'confirm'|'success'|'sos'|'pinDetail'|'auth'|'drawer'|'points'|'settings'|'faq'
+  // 5. Modales y Vistas Activas con Guarda de Autenticación
+  const [activeModal, _setActiveModal] = useState(null); // 'report'|'confirm'|'success'|'sos'|'pinDetail'|'auth'|'drawer'|'points'|'settings'|'faq'
   const [authView, setAuthView] = useState('login'); // 'login'|'register'|'recover-1'|'recover-2'|'recover-3'|'recover-success'
   const [selectedReportId, setSelectedReportId] = useState(null);
+
+  const PROTECTED_MODALS = ['history', 'points', 'personalData', 'settings', 'report', 'confirm', 'sos'];
+
+  const setActiveModal = (modalName) => {
+    if (modalName && PROTECTED_MODALS.includes(modalName) && !user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para acceder a esta función', 'warning');
+      return;
+    }
+    _setActiveModal(modalName);
+  };
 
   // 6. Flujo de Reporte
   const [pendingLocation, setPendingLocation] = useState({ lat: -33.125, lng: -64.350, x: 50, y: 50 });
@@ -247,11 +263,18 @@ export function AppProvider({ children }) {
 
   // Acciones de Reportes
   const startReportAtLocation = ({ lat, lng, x, y }) => {
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para reportar una alerta', 'warning');
+      triggerHaptic([40]);
+      return;
+    }
     setPendingLocation({ lat, lng, x, y });
     setReportDescription('');
     setReportPhoto('');
     setIsAnonymous(false);
-    setActiveModal('report');
+    _setActiveModal('report');
     triggerHaptic([50]);
   };
 
@@ -311,6 +334,13 @@ export function AppProvider({ children }) {
   };
 
   const toggleReaction = (reportId) => {
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para agradecer o validar un reporte', 'warning');
+      triggerHaptic([30]);
+      return;
+    }
     setReports((prev) =>
       prev.map((rep) => {
         if (rep.id === reportId) {
@@ -337,6 +367,13 @@ export function AppProvider({ children }) {
   };
 
   const addComment = (reportId, text) => {
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para comentar en el reporte', 'warning');
+      triggerHaptic([30]);
+      return;
+    }
     if (!text.trim()) return;
     setReports((prev) =>
       prev.map((rep) => {
@@ -394,9 +431,13 @@ export function AppProvider({ children }) {
   };
 
   const logoutUser = () => {
-    setUser((prev) => ({ ...prev, isLoggedIn: false }));
+    setUser((prev) => {
+      const loggedOut = { ...prev, isLoggedIn: false };
+      localStorage.setItem('radar_urbano_user', JSON.stringify(loggedOut));
+      return loggedOut;
+    });
     setConfig((prev) => ({ ...prev, alertRadius: 1 }));
-    setActiveModal(null);
+    _setActiveModal(null);
     showToast('Sesión cerrada correctamente', 'info');
   };
 
@@ -465,6 +506,12 @@ export function AppProvider({ children }) {
   };
 
   const updateUserProfile = (updatedFields) => {
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para actualizar tus datos', 'warning');
+      return;
+    }
     setUser((prev) => {
       const updated = { ...prev, ...updatedFields };
       localStorage.setItem('radar_urbano_user', JSON.stringify(updated));
@@ -475,6 +522,13 @@ export function AppProvider({ children }) {
   };
 
   const markReportResolved = (reportId) => {
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para solucionar reportes', 'warning');
+      triggerHaptic([30]);
+      return;
+    }
     setReports((prev) =>
       prev.map((r) => (r.id === reportId ? { ...r, status: 'resuelto', isResolved: true } : r))
     );
@@ -483,6 +537,13 @@ export function AppProvider({ children }) {
   };
 
   const toggleReportResolved = (reportId) => {
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para gestionar estados de reportes', 'warning');
+      triggerHaptic([30]);
+      return;
+    }
     setReports((prev) =>
       prev.map((r) => {
         if (r.id === reportId) {
@@ -502,6 +563,12 @@ export function AppProvider({ children }) {
 
   // Edición de reporte exclusiva de Moderación
   const updateReport = (reportId, updatedFields) => {
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para editar reportes', 'warning');
+      return;
+    }
     setReports((prev) =>
       prev.map((r) => {
         if (r.id === reportId) {
@@ -522,6 +589,13 @@ export function AppProvider({ children }) {
   };
 
   const deleteReport = (reportId) => {
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      _setActiveModal('auth');
+      showToast('Debes iniciar sesión para eliminar reportes', 'warning');
+      triggerHaptic([30]);
+      return;
+    }
     setReports((prev) => prev.filter((r) => r.id !== reportId));
     showToast('Reporte eliminado de tu historial', 'info');
     triggerHaptic([40]);

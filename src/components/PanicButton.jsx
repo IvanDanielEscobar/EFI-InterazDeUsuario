@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { ShieldAlert } from 'lucide-react';
 
 export default function PanicButton() {
-  const { setActiveModal, triggerHaptic, showToast } = useApp();
+  const { setActiveModal, triggerHaptic, showToast, user, setAuthView } = useApp();
   const [pressProgress, setPressProgress] = useState(0);
   const [isPressing, setIsPressing] = useState(false);
   const pressTimer = useRef(null);
@@ -12,6 +12,14 @@ export default function PanicButton() {
   const HOLD_DURATION = 1500; // 1.5 segundos
 
   const startPress = () => {
+    if (!user?.isLoggedIn) {
+      triggerHaptic([60, 40]);
+      setAuthView('login');
+      setActiveModal('auth');
+      showToast('Debes iniciar sesión para activar el botón SOS de auxilio', 'warning');
+      return;
+    }
+
     setIsPressing(true);
     setPressProgress(0);
     triggerHaptic([40]);
@@ -37,6 +45,12 @@ export default function PanicButton() {
 
   const completeEmergency = () => {
     cancelPress();
+    if (!user?.isLoggedIn) {
+      setAuthView('login');
+      setActiveModal('auth');
+      showToast('Debes iniciar sesión para activar el botón SOS de auxilio', 'warning');
+      return;
+    }
     triggerHaptic([250, 100, 250, 100, 350]);
     setActiveModal('sos');
     showToast('🚨 ALERTA SOS EMITIDA: Transmitiendo ubicación a la red de Río Cuarto', 'emergency');
@@ -46,6 +60,15 @@ export default function PanicButton() {
     <div className="flex flex-col items-center justify-start pointer-events-auto select-none">
       <button
         type="button"
+        onClick={(e) => {
+          if (!user?.isLoggedIn) {
+            e.preventDefault();
+            triggerHaptic([60, 40]);
+            setAuthView('login');
+            setActiveModal('auth');
+            showToast('Debes iniciar sesión para activar el botón SOS de auxilio', 'warning');
+          }
+        }}
         onMouseDown={startPress}
         onMouseUp={cancelPress}
         onMouseLeave={cancelPress}
