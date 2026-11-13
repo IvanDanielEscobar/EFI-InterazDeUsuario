@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { INITIAL_REPORTS, CATEGORIES_CONFIG } from '../data/initialReports';
 import { HARDCODED_USERS } from '../data/users';
 
@@ -55,10 +55,12 @@ export function AppProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.name && parsed.name !== 'Fulano') {
+          // Si el usuario guardado tenía isLoggedIn !== false, o si es un usuario válido previamente activo
+          const isLoggedIn = parsed.isLoggedIn !== undefined ? Boolean(parsed.isLoggedIn) : true;
           return {
             ...fallbackUser,
             ...parsed,
-            isLoggedIn: Boolean(parsed.isLoggedIn)
+            isLoggedIn
           };
         }
       }
@@ -68,14 +70,29 @@ export function AppProvider({ children }) {
     }
   });
 
+  // Referencia sincrónica para evitar stale closures en eventos de Leaflet y timers
+  const userRef = useRef(user);
+  userRef.current = user;
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
   // 2.1 Base de usuarios registrados (inicia con HARDCODED_USERS y almacena nuevos registros)
   const [allUsers, setAllUsers] = useState(() => {
     try {
       const saved = localStorage.getItem('radar_urbano_all_users');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= HARDCODED_USERS.length) {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          // Fusionar usuarios predeterminados con los registrados sin duplicados
+          const merged = [...HARDCODED_USERS];
+          parsed.forEach((p) => {
+            if (p && p.username && !merged.some((m) => m.username.toLowerCase() === p.username.toLowerCase())) {
+              merged.push(p);
+            }
+          });
+          return merged;
         }
       }
       return HARDCODED_USERS;
@@ -123,10 +140,11 @@ export function AppProvider({ children }) {
   const [authView, setAuthView] = useState('login'); // 'login'|'register'|'recover-1'|'recover-2'|'recover-3'|'recover-success'
   const [selectedReportId, setSelectedReportId] = useState(null);
 
-  const PROTECTED_MODALS = ['history', 'points', 'personalData', 'settings', 'report', 'confirm', 'sos'];
+  const PROTECTED_MODALS = ['history', 'points', 'personalData', 'settings', 'sos'];
 
   const setActiveModal = (modalName) => {
-    if (modalName && PROTECTED_MODALS.includes(modalName) && !user?.isLoggedIn) {
+    const isAuth = Boolean(userRef.current?.isLoggedIn);
+    if (modalName && PROTECTED_MODALS.includes(modalName) && !isAuth) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para acceder a esta función', 'warning');
@@ -263,7 +281,8 @@ export function AppProvider({ children }) {
 
   // Acciones de Reportes
   const startReportAtLocation = ({ lat, lng, x, y }) => {
-    if (!user?.isLoggedIn) {
+    const currentUser = userRef.current;
+    if (!currentUser?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para reportar una alerta', 'warning');
@@ -283,13 +302,14 @@ export function AppProvider({ children }) {
       showToast('Por favor describe brevemente la situación', 'warning');
       return;
     }
-    setActiveModal('confirm');
+    _setActiveModal('confirm');
   };
 
   const confirmAndPublishReport = () => {
+    const currentUser = userRef.current;
     const cat = CATEGORIES_CONFIG[selectedCategory] || CATEGORIES_CONFIG.delito;
-    const authorName = isAnonymous ? 'Vecino Anónimo' : user.name;
-    const authorTier = isAnonymous ? null : user.tier;
+    const authorName = isAnonymous ? 'Vecino Anónimo' : (currentUser?.name || 'Vecino');
+    const authorTier = isAnonymous ? null : (currentUser?.tier || 'bronce');
 
     const newReport = {
       id: Date.now(),
@@ -308,7 +328,7 @@ export function AppProvider({ children }) {
       reactions: 1,
       hasReacted: true,
       author: authorName,
-      authorId: user?.id,
+      authorId: currentUser?.id || Date.now(),
       authorTier: authorTier,
       isAnonymous: Boolean(isAnonymous),
       photo: reportPhoto || '',
@@ -319,11 +339,11 @@ export function AppProvider({ children }) {
     setReportDescription('');
     setReportPhoto('');
     setIsAnonymous(false);
-    setActiveModal('success');
+    _setActiveModal('success');
     triggerHaptic([120, 80, 120]);
 
     setTimeout(() => {
-      setActiveModal(null);
+      _setActiveModal(null);
       showToast(
         isAnonymous
           ? '¡Reporte publicado de forma anónima en la red vecinal!'
@@ -334,7 +354,7 @@ export function AppProvider({ children }) {
   };
 
   const toggleReaction = (reportId) => {
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para agradecer o validar un reporte', 'warning');
@@ -355,7 +375,9 @@ export function AppProvider({ children }) {
             if (newTotal >= 20) nextTier = 'diamante';
             else if (newTotal >= 10) nextTier = 'oro';
             else if (newTotal >= 5) nextTier = 'plata';
-            return { ...u, reactionsCount: newTotal, tier: nextTier };
+            const updated = { ...u, reactionsCount: newTotal, tier: nextTier };
+            userRef.current = updated;
+            return updated;
           });
 
           return { ...rep, hasReacted: nextReacted, reactions: nextCount };
@@ -367,7 +389,7 @@ export function AppProvider({ children }) {
   };
 
   const addComment = (reportId, text) => {
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para comentar en el reporte', 'warning');
@@ -375,12 +397,13 @@ export function AppProvider({ children }) {
       return;
     }
     if (!text.trim()) return;
+    const authorName = userRef.current?.name || 'Vecino';
     setReports((prev) =>
       prev.map((rep) => {
         if (rep.id === reportId) {
           return {
             ...rep,
-            comments: [...rep.comments, { author: user.name, text: text.trim() }]
+            comments: [...rep.comments, { author: authorName, text: text.trim() }]
           };
         }
         return rep;
@@ -415,11 +438,14 @@ export function AppProvider({ children }) {
     }
 
     const finalUser = { ...userFound, isLoggedIn: true };
+    userRef.current = finalUser;
     setUser(finalUser);
+    localStorage.setItem('radar_urbano_user', JSON.stringify(finalUser));
+
     // Moderador default 5 km, demás usuarios default 1 km
     const roleRadius = finalUser.isModerator ? 5 : 1;
     setConfig((prev) => ({ ...prev, alertRadius: roleRadius }));
-    setActiveModal(null);
+    _setActiveModal(null);
     showToast(
       finalUser.isModerator
         ? `🛡️ Sesión activa como Moderador: ${finalUser.name} (Radio: 5 km)`
@@ -431,11 +457,10 @@ export function AppProvider({ children }) {
   };
 
   const logoutUser = () => {
-    setUser((prev) => {
-      const loggedOut = { ...prev, isLoggedIn: false };
-      localStorage.setItem('radar_urbano_user', JSON.stringify(loggedOut));
-      return loggedOut;
-    });
+    const loggedOut = { ...(userRef.current || HARDCODED_USERS[0]), isLoggedIn: false };
+    userRef.current = loggedOut;
+    setUser(loggedOut);
+    localStorage.setItem('radar_urbano_user', JSON.stringify(loggedOut));
     setConfig((prev) => ({ ...prev, alertRadius: 1 }));
     _setActiveModal(null);
     showToast('Sesión cerrada correctamente', 'info');
@@ -496,17 +521,25 @@ export function AppProvider({ children }) {
       isLoggedIn: true
     };
 
-    setAllUsers((prev) => [...prev, newUser]);
+    userRef.current = newUser;
     setUser(newUser);
+    localStorage.setItem('radar_urbano_user', JSON.stringify(newUser));
+
+    setAllUsers((prev) => {
+      const nextList = [...prev.filter((u) => u.username.toLowerCase() !== cleanUsername), newUser];
+      localStorage.setItem('radar_urbano_all_users', JSON.stringify(nextList));
+      return nextList;
+    });
+
     setConfig((prev) => ({ ...prev, alertRadius: 1 }));
-    setActiveModal(null);
+    _setActiveModal(null);
     showToast(`¡Bienvenido a Radar Urbano, ${newUser.name}! Sumaste 20 pts de bienvenida`, 'success');
     triggerHaptic([100, 50, 100]);
     return { success: true };
   };
 
   const updateUserProfile = (updatedFields) => {
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para actualizar tus datos', 'warning');
@@ -514,6 +547,7 @@ export function AppProvider({ children }) {
     }
     setUser((prev) => {
       const updated = { ...prev, ...updatedFields };
+      userRef.current = updated;
       localStorage.setItem('radar_urbano_user', JSON.stringify(updated));
       return updated;
     });
@@ -522,7 +556,7 @@ export function AppProvider({ children }) {
   };
 
   const markReportResolved = (reportId) => {
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para solucionar reportes', 'warning');
@@ -537,7 +571,7 @@ export function AppProvider({ children }) {
   };
 
   const toggleReportResolved = (reportId) => {
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para gestionar estados de reportes', 'warning');
@@ -563,7 +597,7 @@ export function AppProvider({ children }) {
 
   // Edición de reporte exclusiva de Moderación
   const updateReport = (reportId, updatedFields) => {
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para editar reportes', 'warning');
@@ -589,7 +623,7 @@ export function AppProvider({ children }) {
   };
 
   const deleteReport = (reportId) => {
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
       showToast('Debes iniciar sesión para eliminar reportes', 'warning');
@@ -602,7 +636,7 @@ export function AppProvider({ children }) {
   };
 
   const redeemPoints = (pointsCost, storeName, discount = '15% OFF') => {
-    if (!user.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       showToast('Inicia sesión o regístrate para canjear puntos', 'warning');
       setAuthView('login');
       setActiveModal('auth');

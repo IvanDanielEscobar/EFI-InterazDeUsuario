@@ -29,6 +29,13 @@ export default function MapCanvas() {
   const markersLayerRef = useRef(null);
   const [isRefExpanded, setIsRefExpanded] = useState(false);
 
+  // Referencia mutable a startReportAtLocation para evitar stale closure en el listener map.on('click')
+  const startReportRef = useRef(startReportAtLocation);
+  startReportRef.current = startReportAtLocation;
+  useEffect(() => {
+    startReportRef.current = startReportAtLocation;
+  }, [startReportAtLocation]);
+
   // Filtrado de reportes
   const filteredReports = activeFilter === 'todos'
     ? reports
@@ -173,7 +180,7 @@ export default function MapCanvas() {
     map.on('click', (e) => {
       setIsRefExpanded(false);
       const { lat, lng } = e.latlng;
-      startReportAtLocation({
+      startReportRef.current({
         lat,
         lng,
         x: 50,
@@ -497,13 +504,6 @@ export default function MapCanvas() {
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                if (!user?.isLoggedIn) {
-                  triggerHaptic([60, 40]);
-                  setAuthView('login');
-                  setActiveModal('auth');
-                  showToast('Debes iniciar sesión para reportar una alerta', 'warning');
-                  return;
-                }
                 startReportAtLocation({
                   lat: RIO_CUARTO_CENTER[0],
                   lng: RIO_CUARTO_CENTER[1],

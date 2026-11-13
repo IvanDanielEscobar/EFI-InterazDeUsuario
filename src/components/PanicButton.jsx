@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { ShieldAlert } from 'lucide-react';
 
@@ -9,10 +9,16 @@ export default function PanicButton() {
   const pressTimer = useRef(null);
   const intervalTimer = useRef(null);
 
+  const userRef = useRef(user);
+  userRef.current = user;
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
   const HOLD_DURATION = 1500; // 1.5 segundos
 
   const startPress = () => {
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       triggerHaptic([60, 40]);
       setAuthView('login');
       setActiveModal('auth');
@@ -45,7 +51,7 @@ export default function PanicButton() {
 
   const completeEmergency = () => {
     cancelPress();
-    if (!user?.isLoggedIn) {
+    if (!userRef.current?.isLoggedIn) {
       setAuthView('login');
       setActiveModal('auth');
       showToast('Debes iniciar sesión para activar el botón SOS de auxilio', 'warning');
@@ -61,7 +67,7 @@ export default function PanicButton() {
       <button
         type="button"
         onClick={(e) => {
-          if (!user?.isLoggedIn) {
+          if (!userRef.current?.isLoggedIn) {
             e.preventDefault();
             triggerHaptic([60, 40]);
             setAuthView('login');

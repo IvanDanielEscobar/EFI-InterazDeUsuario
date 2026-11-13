@@ -48,3 +48,13 @@ Este documento recopila las trampas de desarrollo, errores frecuentes de maqueta
 ## 🚪 6. Atrapamiento en Modales y Diálogos
 - **Problema**: Modales de confirmación o de recuperación de contraseña que no pueden cerrarse al tocar fuera o presionar la tecla `Escape`.
 - **Solución Mandatoria**: Escuchar el evento de teclado `Escape` a nivel global en `document`, permitir clic en el backdrop oscuro exterior y proveer un botón de cierre con área táctil mínima de 44px (`min-h-[44px] min-w-[44px]`).
+
+---
+
+## 🔄 7. Stale Closure en Listeners de Leaflet (`map.on('click')`) y Guardas de Autenticación
+- **Problema**: Al inicializar la instancia cartográfica de Leaflet en un `useEffect(..., [])`, registrar listeners como `map.on('click', ...)` capturaba la versión inicial de `startReportAtLocation` creada en el montaje (donde `user.isLoggedIn` era `false`). Tras iniciar sesión o registrarse, el listener de Leaflet continuaba invocando la clausura desactualizada, enviando erróneamente al usuario logueado de vuelta al formulario de login con la advertencia de requerimiento de autenticación. De igual manera, al cargar una sesión previa de `localStorage`, la falta de un flag booleano explícito provocaba que usuarios existentes fueran catalogados como no logueados.
+- **Solución Mandatoria**:
+  1. En componentes con listeners persistentes de terceros (Leaflet, WebSockets, DOM directo), utilizar siempre un `useRef` mutable (`startReportRef.current = startReportAtLocation`) que se actualice sincrónicamente en cada render.
+  2. En el Provider de estado global (`AppContext`), mantener una referencia sincrónica `userRef.current = user` y consultar el estado de autenticación a través de dicha referencia para garantizar lecturas siempre frescas en callbacks asíncronos y eventos diferidos.
+  3. En la inicialización desde `localStorage`, preservar la sesión activa si el objeto de usuario existe y no fue explícitamente cerrado (`parsed.isLoggedIn !== false`).
+  4. Sincronizar de forma inmediata `userRef.current`, `setUser` y `localStorage.setItem` en las funciones `loginUser` y `registerUser`.

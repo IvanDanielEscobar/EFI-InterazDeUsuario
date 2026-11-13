@@ -78,6 +78,7 @@
     "ADR-036: Diferenciación Cromática, Espaciado Generoso y Filtrado por Categoría en Historial",
     "ADR-037: Publicación de Reportes Anónimos y Carga de Evidencia Fotográfica",
     "ADR-038: Inversión Ergonómica Integral en Modo para Zurdos (Dock y Segmentos de Referencias/Alertas)",
-    "ADR-039: Restricción de Visibilidad y Guardas de Autenticación para Invitados"
+    "ADR-039: Restricción de Visibilidad y Guardas de Autenticación para Invitados",
+    "ADR-040: Blindaje Antiestancamiento de Sesión (Stale Closure en Leaflet y Persistencia Resiliente)"
   ]
 }

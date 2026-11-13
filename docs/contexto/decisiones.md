@@ -467,3 +467,24 @@ Este documento es una bitácora cronológica con Fecha y Hora de todas las decis
   5. En [`src/App.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/App.jsx):
      - En el subheader, renderizar el botón interactivo de ajuste de distancia solo si `user?.isLoggedIn`, exhibiendo texto plano informativo cuando es invitado.
 - **Consecuencias**: Seguridad de datos, diferenciación nítida entre experiencia de invitado y vecino autenticado, y navegación fluida orientada a la conversión de usuarios hacia el login.
+
+---
+
+### [ADR-040] · [2026-11-13 10:50] Blindaje Antiestancamiento de Sesión (Stale Closure en Leaflet y Persistencia Resiliente)
+- **Contexto**:
+  1. Tras implementar las guardas de autenticación de invitados, los usuarios autenticados (tanto con cuentas predeterminadas como con usuarios recién registrados en `localStorage`) experimentaban un bloqueo al intentar crear un reporte: al hacer clic en el mapa de Río Cuarto, eran redirigidos erróneamente al formulario de inicio de sesión.
+  2. Causa raíz:
+     - En `MapCanvas.jsx`, el listener `map.on('click')` de Leaflet fue registrado dentro de un `useEffect` con array de dependencias vacío `[]`, capturando en su clausura la versión inicial de `startReportAtLocation` en la que `user.isLoggedIn` era `false`.
+     - En la hidratación inicial de `AppContext.jsx`, `Boolean(parsed.isLoggedIn)` evaluaba a `false` en sesiones preexistentes donde `isLoggedIn` no había sido almacenado explícitamente como booleano.
+- **Decisión**:
+  1. En [`src/components/MapCanvas.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/MapCanvas.jsx):
+     - Introducir `startReportRef` mutable (`useRef`) sincronizado sincrónicamente en cada render, de modo que `map.on('click')` siempre ejecute la función más reciente con el estado de autenticación actualizado.
+     - Delegar la acción del botón "Agregar Alerta" directamente a `startReportAtLocation`, unificando el punto de validación.
+  2. En [`src/context/AppContext.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/context/AppContext.jsx):
+     - Incorporar `userRef` mutable actualizado sincrónicamente, utilizándolo en `startReportAtLocation`, `setActiveModal`, `loginUser`, `registerUser`, `logoutUser` y demás guardas de negocio para garantizar lecturas libres de stale closures.
+     - Sincronizar de forma inmediata `userRef.current`, `setUser` y `localStorage.setItem('radar_urbano_user', ...)` en `loginUser` y `registerUser`.
+     - En la inicialización desde `localStorage`, mantener activa la sesión si existe una cuenta guardada válida y no fue cerrada explícitamente (`isLoggedIn = parsed.isLoggedIn !== undefined ? Boolean(parsed.isLoggedIn) : true`).
+     - Desacoplar `'report'` y `'confirm'` de `PROTECTED_MODALS` para evitar intercepciones redundantes durante el flujo activo de redacción de la alerta.
+  3. En [`src/components/PanicButton.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/PanicButton.jsx):
+     - Implementar `userRef` mutable para validar de forma confiable la pulsación sostenida del botón SOS sin depender de clausuras asíncronas del temporizador.
+- **Consecuencias**: Erradicación definitiva de redirecciones no deseadas al formulario de login para usuarios autenticados, navegación cartográfica fluida al reportar incidentes y sincronización sólida en `localStorage`.

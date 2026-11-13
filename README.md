@@ -149,7 +149,7 @@ efi/
 └── docs/
     └── contexto/                # Master Context y Documentación Viva de Ingeniería
         ├── arquitectura.md      # Arquitectura en capas, flujo de datos y patrones
-        ├── decisiones.md        # Registro vivo de 39 Decisiones de Arquitectura (ADR)
+        ├── decisiones.md        # Registro de Decisiones de Arquitectura (ADR)
         ├── convenciones.md      # Estándares de código, nomenclatura y Git
         ├── glosario.md          # Reglas de negocio y términos del dominio
         ├── flujo-de-trabajo.md  # Pipelines, DoD y comandos frecuentes
