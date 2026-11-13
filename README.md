@@ -28,7 +28,7 @@ Radar Urbano transforma la seguridad ciudadana en una red colaborativa, accesibl
 - **Simbología Geométrica Universal**: Cada tipo de alerta cuenta con una forma geométrica SVG única para personas con daltonismo o dificultades visuales.
 - **Reportes Anónimos y Evidencia Fotográfica**: Protección total de la identidad del denunciante en situaciones de riesgo personal, con soporte de fotos comprimidas en el cliente.
 - **Botón de Pánico SOS Ergonómico**: Presión sostenida de 1.5s (Ley de Fitts) con respuesta háptica y conexión directa a servicios de auxilio (911, 107, 103, 100).
-- **Geocerca Dinámica por Rol**: Radio geodésico diferenciado (1 km para vecinos de a pie, 5 km para supervisión institucional de moderadores).
+- **Geocerca Dinámica por Rol**: Radio geodésico diferenciado (1 km para vecinos, 5 km para supervisión institucional de moderadores).
 - **Gamificación Cívica**: Sistema de reputación barrial por validaciones comunitarias y canje de cupones de descuento en comercios adheridos.
 - **Guardas de Autenticación & Modo Invitado**: Opciones privadas reservadas a usuarios logueados, con interceptación guiada y amable para invitados.
 
@@ -109,7 +109,7 @@ Para garantizar la accesibilidad de usuarios con daltonismo (protanopía, deuter
 
 ### 7. Formulario de Autenticación Limpio & Políticas de Privacidad
 - **Blindaje Anti-Autofill**: Entradas de usuario y contraseña limpias sin credenciales preescritas ni autocompletados invasivos.
-- **Preguntas Frecuentes y Términos**: Modal con respuestas a dudas habituales sobre funcionamiento del radar, geocerca, canje de puntos y política de privacidad de reportes anónimos.
+- **Preguntas Frecuentes y Manual de Usuario**: Modal con respuestas a dudas habituales sobre funcionamiento del radar, geocerca, canje de puntos, política de privacidad de reportes anónimos y acceso al Manual de Usuario interactivo para usuarios autenticados.
 
 ---
 
@@ -137,7 +137,8 @@ efi/
 │   │   ├── PointsModal.jsx      # Catálogo de cupones y canje de puntos barriales
 │   │   ├── PersonalDataModal.jsx# Gestión de perfil vecinal, DNI, teléfono y barrio
 │   │   ├── SettingsModal.jsx    # Ajuste de radio geodésico y ergonomía para zurdos
-│   │   ├── FaqModal.jsx         # Preguntas frecuentes, términos y privacidad de datos
+│   │   ├── FaqModal.jsx         # Preguntas frecuentes, términos, privacidad y acceso a Manual de Usuario
+│   │   ├── TutorialTourModal.jsx# Manual de usuario interactivo paso a paso por la plataforma
 │   │   ├── DrawerMenu.jsx       # Menú lateral responsive diferenciado para invitado/logueado
 │   │   ├── AuthModal.jsx        # Login limpio, registro vecinal y recuperación de contraseña
 │   │   └── UserAvatar.jsx       # Avatar inteligente con generación de iniciales y rangos

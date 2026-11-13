@@ -21,6 +21,18 @@ export function calculateDistanceKm(lat1, lon1, lat2, lon2) {
   return Number((R * c).toFixed(2));
 }
 
+/**
+ * Calcula el rango o marco cívico del vecino en función de sus validaciones
+ */
+export function calculateTier(validationsCount, isModerator = false) {
+  if (isModerator) return 'diamante';
+  const count = Number(validationsCount) || 0;
+  if (count >= 20) return 'diamante';
+  if (count >= 10) return 'oro';
+  if (count >= 5) return 'plata';
+  return 'bronce';
+}
+
 const DEFAULT_CONFIG = {
   theme: 'dark',
   isLeftHanded: false,
@@ -38,12 +50,21 @@ export function AppProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= INITIAL_REPORTS.length) {
-          return parsed;
+          return parsed.map((r) => ({
+            ...r,
+            validatedBy: Array.isArray(r.validatedBy) ? r.validatedBy : []
+          }));
         }
       }
-      return INITIAL_REPORTS;
+      return INITIAL_REPORTS.map((r) => ({
+        ...r,
+        validatedBy: Array.isArray(r.validatedBy) ? r.validatedBy : []
+      }));
     } catch {
-      return INITIAL_REPORTS;
+      return INITIAL_REPORTS.map((r) => ({
+        ...r,
+        validatedBy: Array.isArray(r.validatedBy) ? r.validatedBy : []
+      }));
     }
   });
 
@@ -136,9 +157,16 @@ export function AppProvider({ children }) {
   const [activeFilter, setActiveFilter] = useState('todos');
 
   // 5. Modales y Vistas Activas con Guarda de Autenticación
-  const [activeModal, _setActiveModal] = useState(null); // 'report'|'confirm'|'success'|'sos'|'pinDetail'|'auth'|'drawer'|'points'|'settings'|'faq'
+  const [activeModal, _setActiveModal] = useState(null); // 'report'|'confirm'|'success'|'sos'|'pinDetail'|'auth'|'drawer'|'points'|'settings'|'faq'|'tutorial'
   const [authView, setAuthView] = useState('login'); // 'login'|'register'|'recover-1'|'recover-2'|'recover-3'|'recover-success'
   const [selectedReportId, setSelectedReportId] = useState(null);
+  const [tutorialStep, setTutorialStep] = useState(0);
+
+  const startTutorial = (stepIndex = 0) => {
+    setTutorialStep(stepIndex);
+    _setActiveModal('tutorial');
+    triggerHaptic([40]);
+  };
 
   const PROTECTED_MODALS = ['history', 'points', 'personalData', 'settings', 'sos'];
 
@@ -207,6 +235,17 @@ export function AppProvider({ children }) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Recorrido guiado automático para usuarios nuevos / primera visita
+  useEffect(() => {
+    const hasSeen = localStorage.getItem('radar_urbano_tutorial_seen');
+    if (!hasSeen) {
+      const timer = setTimeout(() => {
+        _setActiveModal((curr) => (curr === null ? 'tutorial' : curr));
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   // Vibración segura
@@ -325,9 +364,11 @@ export function AppProvider({ children }) {
       icon: cat.icon,
       color: cat.color,
       badgeBg: cat.bg,
-      reactions: 1,
-      hasReacted: true,
+      reactions: 0,
+      hasReacted: false,
+      validatedBy: [],
       author: authorName,
+      authorUsername: isAnonymous ? null : currentUser?.username,
       authorId: currentUser?.id || Date.now(),
       authorTier: authorTier,
       isAnonymous: Boolean(isAnonymous),
@@ -353,40 +394,157 @@ export function AppProvider({ children }) {
     }, 2200);
   };
 
-  const toggleReaction = (reportId) => {
-    if (!userRef.current?.isLoggedIn) {
+  /**
+   * Validación cívica comunitaria:
+   * - Única por usuario por reporte.
+   * - Modifica la condición de los marcos y el status (puntos y rango) tanto del validador como del publicador.
+   */
+  const validateReport = (reportId) => {
+    const currentUser = userRef.current;
+    if (!currentUser?.isLoggedIn) {
       setAuthView('login');
       _setActiveModal('auth');
-      showToast('Debes iniciar sesión para agradecer o validar un reporte', 'warning');
+      showToast('Debes iniciar sesión para validar un reporte', 'warning');
       triggerHaptic([30]);
       return;
     }
+
+    const currentUsername = (currentUser.username || '').toLowerCase();
+    const targetReport = reports.find((r) => r.id === reportId);
+    if (!targetReport) return;
+
+    const validatedBy = Array.isArray(targetReport.validatedBy)
+      ? targetReport.validatedBy.map((v) => String(v).toLowerCase())
+      : [];
+
+    if (validatedBy.includes(currentUsername)) {
+      showToast('Ya has validado este reporte vecinal', 'info');
+      triggerHaptic([20]);
+      return;
+    }
+
+    // 1. Identificar al publicador (autor del reporte)
+    const authorUsername = (targetReport.authorUsername || '').toLowerCase();
+    const authorName = (targetReport.author || '').toLowerCase();
+
+    // 2. Incrementar validación en el reporte
+    const newValidatedBy = [...validatedBy, currentUsername];
+    const newReactions = (targetReport.reactions || 0) + 1;
+
+    // 3. Modificar status y marco del que valida (currentUser):
+    // Gana +1 en su contador de validaciones y +5 puntos cívicos
+    const validatorNewReactionsCount = (currentUser.reactionsCount || 0) + 1;
+    const validatorNewPoints = (currentUser.points || 0) + 5;
+    const validatorNewTier = calculateTier(validatorNewReactionsCount, currentUser.isModerator);
+    const validatorTierUpgraded = validatorNewTier !== currentUser.tier;
+
+    let updatedCurrentUser = {
+      ...currentUser,
+      reactionsCount: validatorNewReactionsCount,
+      points: validatorNewPoints,
+      tier: validatorNewTier
+    };
+
+    // 4. Modificar status y marco del que publica (autor)
+    let newAuthorTier = targetReport.authorTier || calculateTier(newReactions);
+
+    setAllUsers((prevUsers) => {
+      const nextList = prevUsers.map((u) => {
+        const uUsername = (u.username || '').toLowerCase();
+        const uName = (u.name || '').toLowerCase();
+        const isAuthor =
+          (authorUsername && uUsername === authorUsername) ||
+          (authorName && (uName === authorName || authorName.startsWith(uName) || uName.startsWith(authorName)));
+
+        if (isAuthor) {
+          // El publicador gana +1 validación recibida y +10 puntos por aporte cívico validado
+          const authorNewReactions = (u.reactionsCount || 0) + 1;
+          const authorNewPoints = (u.points || 0) + 10;
+          const authorTierCalc = calculateTier(authorNewReactions, u.isModerator);
+          newAuthorTier = authorTierCalc;
+
+          const updatedAuthor = {
+            ...u,
+            reactionsCount: authorNewReactions,
+            points: authorNewPoints,
+            tier: authorTierCalc
+          };
+
+          // Si el publicador es el mismo usuario logueado actualmente
+          if (uUsername === currentUsername) {
+            updatedCurrentUser = {
+              ...updatedCurrentUser,
+              reactionsCount: authorNewReactions,
+              points: updatedCurrentUser.points + 10,
+              tier: authorTierCalc
+            };
+            return updatedCurrentUser;
+          }
+
+          return updatedAuthor;
+        }
+
+        // Si es el validador en la lista global
+        if (uUsername === currentUsername) {
+          return updatedCurrentUser;
+        }
+
+        return u;
+      });
+
+      localStorage.setItem('radar_urbano_all_users', JSON.stringify(nextList));
+      return nextList;
+    });
+
+    // Guardar validador activo
+    userRef.current = updatedCurrentUser;
+    setUser(updatedCurrentUser);
+    localStorage.setItem('radar_urbano_user', JSON.stringify(updatedCurrentUser));
+
+    // Si el autor no estaba en allUsers (ej. usuarios semilla como "Camila U." o "Don Roberto"),
+    // aseguramos que su tier avance según las validaciones acumuladas en el reporte
+    if (!newAuthorTier || newAuthorTier === targetReport.authorTier) {
+      newAuthorTier = calculateTier(newReactions, false);
+    }
+
+    // 5. Actualizar la lista de reportes con el nuevo autorTier y la lista de validadores
     setReports((prev) =>
       prev.map((rep) => {
         if (rep.id === reportId) {
-          const nextReacted = !rep.hasReacted;
-          const delta = nextReacted ? 1 : -1;
-          const nextCount = rep.reactions + delta;
-
-          // Reaccionar al autor
-          setUser((u) => {
-            const newTotal = Math.max(0, u.reactionsCount + delta);
-            let nextTier = 'bronce';
-            if (newTotal >= 20) nextTier = 'diamante';
-            else if (newTotal >= 10) nextTier = 'oro';
-            else if (newTotal >= 5) nextTier = 'plata';
-            const updated = { ...u, reactionsCount: newTotal, tier: nextTier };
-            userRef.current = updated;
-            return updated;
-          });
-
-          return { ...rep, hasReacted: nextReacted, reactions: nextCount };
+          return {
+            ...rep,
+            reactions: newReactions,
+            hasReacted: true,
+            validatedBy: newValidatedBy,
+            authorTier: newAuthorTier
+          };
+        }
+        // Sincronizar authorTier en otros reportes del mismo autor si correspondiera
+        if (
+          (authorUsername && (rep.authorUsername || '').toLowerCase() === authorUsername) ||
+          (authorName && (rep.author || '').toLowerCase() === authorName)
+        ) {
+          return {
+            ...rep,
+            authorTier: newAuthorTier
+          };
         }
         return rep;
       })
     );
-    triggerHaptic([50]);
+
+    triggerHaptic([60]);
+    if (validatorTierUpgraded) {
+      showToast(
+        `¡Reporte validado (+5 pts)! Ascendiste al Marco ${validatorNewTier.toUpperCase()} 🏆`,
+        'success'
+      );
+    } else {
+      showToast('¡Reporte validado con éxito! Sumaste +5 pts y tu marco avanzó', 'success');
+    }
   };
+
+  const toggleReaction = validateReport;
 
   const addComment = (reportId, text) => {
     if (!userRef.current?.isLoggedIn) {
@@ -535,6 +693,12 @@ export function AppProvider({ children }) {
     _setActiveModal(null);
     showToast(`¡Bienvenido a Radar Urbano, ${newUser.name}! Sumaste 20 pts de bienvenida`, 'success');
     triggerHaptic([100, 50, 100]);
+
+    // Ofrecer el tutorial interactivo al nuevo usuario registrado
+    setTimeout(() => {
+      startTutorial(0);
+    }, 1200);
+
     return { success: true };
   };
 
@@ -776,7 +940,9 @@ export function AppProvider({ children }) {
         startReportAtLocation,
         submitReportDraft,
         confirmAndPublishReport,
+        validateReport,
         toggleReaction,
+        calculateTier,
         addComment,
         loginUser,
         logoutUser,
@@ -794,7 +960,10 @@ export function AppProvider({ children }) {
         focusMapOn,
         jumpToFigmaScreen,
         centerTrigger,
-        recenterMap
+        recenterMap,
+        tutorialStep,
+        setTutorialStep,
+        startTutorial
       }}
     >
       {children}

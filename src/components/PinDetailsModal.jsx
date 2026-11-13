@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import {
   X,
   ThumbsUp,
+  Check,
   Send,
   Camera,
   Shield,
@@ -20,6 +21,7 @@ export default function PinDetailsModal() {
     activeModal,
     setActiveModal,
     selectedReport,
+    validateReport,
     toggleReaction,
     addComment,
     user,
@@ -59,6 +61,14 @@ export default function PinDetailsModal() {
 
   const isResolved = selectedReport.status === 'resuelto' || selectedReport.isResolved;
   const isModerator = Boolean(user?.isModerator || user?.role === 'moderator');
+
+  const currentUsername = (user?.username || '').toLowerCase();
+  const hasUserValidated = Boolean(
+    user?.isLoggedIn &&
+    selectedReport &&
+    Array.isArray(selectedReport.validatedBy) &&
+    selectedReport.validatedBy.some((v) => String(v).toLowerCase() === currentUsername)
+  );
 
   const distanceKm = calculateDistanceKm(
     RIO_CUARTO_CENTER[0],
@@ -320,22 +330,41 @@ export default function PinDetailsModal() {
           </>
         )}
 
-        {/* Validación Vecinal ("Me sirvió") */}
-        <div className="flex items-center justify-between py-2 border-y border-slate-800 mb-3">
+        {/* Validación del Reporte */}
+        <div className="flex items-center justify-between py-2.5 border-y border-slate-800 mb-3">
           <button
             type="button"
-            onClick={() => toggleReaction(selectedReport.id)}
-            className={`btn-interactive flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-              selectedReport.hasReacted
-                ? 'bg-emerald-600 text-white border-emerald-500'
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+            onClick={() => validateReport(selectedReport.id)}
+            disabled={hasUserValidated}
+            className={`btn-interactive flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+              hasUserValidated
+                ? 'bg-emerald-600/90 text-white border-emerald-500 shadow-sm cursor-default'
+                : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-emerald-600/20 hover:text-emerald-300 hover:border-emerald-500/40 cursor-pointer active:scale-95'
             }`}
+            title={hasUserValidated ? 'Ya has validado este reporte' : 'Validar este reporte vecinal'}
+            aria-label={hasUserValidated ? `Reporte validado, ${selectedReport.reactions || 0} validaciones` : `Validar reporte, actualmente ${selectedReport.reactions || 0} validaciones`}
           >
-            <ThumbsUp className="w-3.5 h-3.5" />
-            <span>Agradecer / Me sirvió</span>
-            <span className="bg-slate-900/40 px-1.5 py-0.5 rounded-md">{selectedReport.reactions}</span>
+            {hasUserValidated ? (
+              <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+            ) : (
+              <ThumbsUp className="w-3.5 h-3.5" />
+            )}
+            <span>{hasUserValidated ? 'Validado' : 'Validar'}</span>
+            <span className="bg-slate-900/50 px-1.5 py-0.5 rounded-md font-mono text-[11px]">
+              {selectedReport.reactions || 0}
+            </span>
           </button>
-          <span className="text-xs text-slate-400">Validación vecinal</span>
+
+          {hasUserValidated ? (
+            <span className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
+              <Check className="w-3 h-3 stroke-[2.5]" />
+              Has validado este reporte
+            </span>
+          ) : (
+            <span className="text-[11px] text-slate-400">
+              +{5} pts por validar
+            </span>
+          )}
         </div>
 
         {/* Hilo de Comentarios */}

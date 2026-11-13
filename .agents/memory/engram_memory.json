@@ -79,6 +79,9 @@
     "ADR-037: Publicación de Reportes Anónimos y Carga de Evidencia Fotográfica",
     "ADR-038: Inversión Ergonómica Integral en Modo para Zurdos (Dock y Segmentos de Referencias/Alertas)",
     "ADR-039: Restricción de Visibilidad y Guardas de Autenticación para Invitados",
-    "ADR-040: Blindaje Antiestancamiento de Sesión (Stale Closure en Leaflet y Persistencia Resiliente)"
+    "ADR-040: Blindaje Antiestancamiento de Sesión (Stale Closure en Leaflet y Persistencia Resiliente)",
+    "ADR-041: Sistema de Onboarding y Recorrido Guiado Interactivo (Tutorial)",
+    "ADR-042: Estandarización de Preguntas Frecuentes, Homogeneización de Nombres entre Desktop y Móvil y Refactorización del Manual de Usuario",
+    "ADR-043: Validación Única de Reportes, Desacoplamiento de Terminología y Mutación Dinámica de Marcos y Status de Usuarios"
   ]
 }

@@ -27,7 +27,7 @@ export default function MapCanvas() {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersLayerRef = useRef(null);
-  const [isRefExpanded, setIsRefExpanded] = useState(false);
+  const [isRefExpanded, setIsRefExpanded] = useState(true);
 
   // Referencia mutable a startReportAtLocation para evitar stale closure en el listener map.on('click')
   const startReportRef = useRef(startReportAtLocation);

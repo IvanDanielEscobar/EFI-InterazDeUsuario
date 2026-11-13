@@ -3,12 +3,9 @@ import { useApp } from '../context/AppContext';
 import {
   X,
   Sliders,
-  CheckCircle2,
   MapPin,
   Moon,
   Sun,
-  RotateCcw,
-  Smartphone,
   Eye,
   ShieldAlert
 } from 'lucide-react';
@@ -36,8 +33,7 @@ export default function SettingsModal() {
     toggleTheme,
     toggleLeftHanded,
     setAlertRadius,
-    setActiveNeighborhood,
-    resetDemoData
+    setActiveNeighborhood
   } = useApp();
 
   if (activeModal !== 'settings') return null;
@@ -260,44 +256,6 @@ export default function SettingsModal() {
                     <span>Cambiar a Oscuro</span>
                   </>
                 )}
-              </button>
-            </div>
-          </section>
-
-          {/* SECCIÓN 3: MOTOR CARTOGRÁFICO & DATOS */}
-          <section className="space-y-3">
-            <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>Infraestructura & Datos</span>
-            </h3>
-
-            {/* Motor Cartográfico Activo */}
-            <div className="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700 space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-xs text-slate-200">Proveedor de Cartografía:</span>
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                  <CheckCircle2 className="w-3 h-3" />
-                  OpenStreetMap (HOT)
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                Cartografía urbana 100% libre y comunitaria de Río Cuarto. Sin marcas de agua ni costos por uso.
-              </p>
-            </div>
-
-            {/* Restablecer Datos de Demostración */}
-            <div className="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700 flex items-center justify-between gap-3">
-              <div>
-                <p className="font-bold text-xs text-white">Datos de Demostración</p>
-                <p className="text-[11px] text-slate-400">Restaura los reportes, cupones y puntos iniciales</p>
-              </div>
-              <button
-                type="button"
-                onClick={resetDemoData}
-                className="btn-interactive flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 active:scale-95 text-red-300 border border-red-500/40 text-xs font-bold transition-all focus-visible:outline-none"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Restablecer</span>
               </button>
             </div>
           </section>

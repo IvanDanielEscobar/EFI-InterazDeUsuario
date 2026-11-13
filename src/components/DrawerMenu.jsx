@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { X, ChevronRight, LogOut, Gift, Settings, HelpCircle, FileText, User, Shield } from 'lucide-react';
+import { X, ChevronRight, LogOut, Gift, Sliders, HelpCircle, Clock, User, Map } from 'lucide-react';
 import UserAvatar from './UserAvatar';
 
 export default function DrawerMenu() {
@@ -79,17 +79,41 @@ export default function DrawerMenu() {
               </div>
             </div>
 
-            <nav className="space-y-1 text-sm font-semibold text-slate-200">
+            <nav className="space-y-1 text-sm font-semibold text-slate-200" aria-label="Navegación del menú">
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between transition-all"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Map className="w-4 h-4 text-slate-400" />
+                  <span>Mapa</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-500" />
+              </button>
+
               <button
                 type="button"
                 onClick={() => setActiveModal('history')}
                 className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between transition-all"
               >
                 <div className="flex items-center gap-2.5">
-                  <FileText className="w-4 h-4 text-slate-400" />
-                  <span>Historial de reportes</span>
+                  <Clock className="w-4 h-4 text-slate-400" />
+                  <span>Historial</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveModal('points')}
+                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between transition-all"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Gift className="w-4 h-4 text-amber-400" />
+                  <span>Puntos</span>
+                </div>
+                <span className="text-amber-400 text-xs font-bold">{user.points} pts</span>
               </button>
 
               <button
@@ -99,31 +123,19 @@ export default function DrawerMenu() {
               >
                 <div className="flex items-center gap-2.5">
                   <User className="w-4 h-4 text-slate-400" />
-                  <span>Datos personales</span>
+                  <span>Datos Personales</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500" />
               </button>
 
               <button
                 type="button"
-                onClick={() => setActiveModal('points')}
-                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Gift className="w-4 h-4 text-amber-400" />
-                  <span>Canjea tus puntos</span>
-                </div>
-                <span className="text-amber-400 text-xs font-bold">{user.points} pts</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => setActiveModal('settings')}
-                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between"
+                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between transition-all"
               >
                 <div className="flex items-center gap-2.5">
-                  <Settings className="w-4 h-4 text-slate-400" />
-                  <span>Configuración de Zonas</span>
+                  <Sliders className="w-4 h-4 text-slate-400" />
+                  <span>Configuración</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500" />
               </button>
@@ -131,11 +143,11 @@ export default function DrawerMenu() {
               <button
                 type="button"
                 onClick={() => setActiveModal('faq')}
-                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between"
+                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between transition-all"
               >
                 <div className="flex items-center gap-2.5">
                   <HelpCircle className="w-4 h-4 text-slate-400" />
-                  <span>Preguntas frecuentes</span>
+                  <span>Preguntas Frecuentes</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500" />
               </button>
@@ -151,7 +163,7 @@ export default function DrawerMenu() {
             </button>
           </div>
         ) : (
-          /* SECCIÓN NO LOGUEADO: Solo acciones generales (Login/Registro y Preguntas frecuentes) */
+          /* SECCIÓN NO LOGUEADO: Solo acciones generales (Login/Registro, Mapa y Preguntas Frecuentes) */
           <div className="flex flex-col">
             <button
               type="button"
@@ -164,15 +176,27 @@ export default function DrawerMenu() {
               Iniciar Sesión / Registrarse
             </button>
 
-            <nav className="space-y-1 text-sm font-semibold text-slate-200">
+            <nav className="space-y-1 text-sm font-semibold text-slate-200" aria-label="Navegación del menú">
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between transition-all"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Map className="w-4 h-4 text-slate-400" />
+                  <span>Mapa</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-500" />
+              </button>
+
               <button
                 type="button"
                 onClick={() => setActiveModal('faq')}
-                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between"
+                className="w-full text-left p-3 rounded-xl hover:bg-slate-800 flex items-center justify-between transition-all"
               >
                 <div className="flex items-center gap-2.5">
                   <HelpCircle className="w-4 h-4 text-slate-400" />
-                  <span>Preguntas frecuentes</span>
+                  <span>Preguntas Frecuentes</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500" />
               </button>

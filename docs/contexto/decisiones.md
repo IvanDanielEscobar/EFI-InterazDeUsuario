@@ -488,3 +488,81 @@ Este documento es una bitácora cronológica con Fecha y Hora de todas las decis
   3. En [`src/components/PanicButton.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/PanicButton.jsx):
      - Implementar `userRef` mutable para validar de forma confiable la pulsación sostenida del botón SOS sin depender de clausuras asíncronas del temporizador.
 - **Consecuencias**: Erradicación definitiva de redirecciones no deseadas al formulario de login para usuarios autenticados, navegación cartográfica fluida al reportar incidentes y sincronización sólida en `localStorage`.
+
+---
+
+### [ADR-041] · [2026-11-13 11:15] Sistema de Onboarding y Recorrido Guiado Interactivo (Tutorial)
+- **Contexto**:
+  1. Nuevos vecinos que ingresan a Radar Urbano necesitan comprender rápidamente el alcance comunitario de la plataforma, cómo interpretar la cartografía y la simbología geométrica universal, las dos maneras de crear un reporte, el funcionamiento seguro del botón SOS de pánico y todas las opciones que componen el menú.
+  2. Asimismo, el recorrido guiado debía ser permanentemente accesible a demanda desde la sección de *"Preguntas Frecuentes"* (y el menú lateral) para repasar cualquier concepto en cualquier momento.
+- **Decisión**:
+  1. Creación de [`src/components/TutorialTourModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/TutorialTourModal.jsx):
+     - Modal interactivo de 6 pasos con diseño de alto contraste, badges temáticos, dots interactivos de avance, atajos de teclado (<kbd>←</kbd>, <kbd>→</kbd>, <kbd>Esc</kbd>) y respuesta háptica.
+     - **Paso 1 (Bienvenida & Alcance)**: Saludo personalizado con el nombre del usuario logueado (`user.name`), identidad gráfica y resumen de objetivos de prevención ciudadana en Río Cuarto.
+     - **Paso 2 (El Mapa)**: Explicación de la cartografía en vivo, geocerca por proximidad y la simbología geométrica universal accesible (rombo para delito, triángulo para sospechoso, círculo para luz, cuadrado para baldío, pentágono para violencia y hexágono para resuelto).
+     - **Paso 3 (Agregar Alerta)**: Detalle pedagógico de los dos métodos de reporte (botón inferior automático según tu ubicación vs. toque manual en cualquier calle del mapa), junto a las funciones de protección ("Vecino Anónimo" y carga de fotografía).
+     - **Paso 4 (Botón SOS)**: Explicación de la presión sostenida de 1.5s (Ley de Fitts), respuesta háptica, acceso directo a 911, 107, 100 y 103, y modo para zurdos.
+     - **Paso 5 (Menú uno por uno)**: Desglose exhaustivo de Historial y filtros, Puntos y comercios adheridos, Datos personales y rangos cívicos, Configuración de radio y Modo Claro/Oscuro.
+     - **Paso 6 (¡Listo para Colaborar!)**: Cierre motivacional con recordatorio de disponibilidad permanente en FAQ.
+  2. En [`src/context/AppContext.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/context/AppContext.jsx):
+     - Gestión del estado `tutorialStep`, función `startTutorial(stepIndex)` y detección en montaje para usuarios primerizos (`!localStorage.getItem('radar_urbano_tutorial_seen')`).
+     - Activación automática tras el registro exitoso de un nuevo vecino (`registerUser`).
+  3. En [`src/components/FaqModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/FaqModal.jsx) y [`src/components/DrawerMenu.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/DrawerMenu.jsx):
+     - Incorporación de un banner y accesos directos destacados para lanzar el tutorial en cualquier momento a voluntad del usuario.
+- **Consecuencias**: Reducción drástica de la fricción de adopción inicial, comprensión inmediata de las mecánicas comunitarias y experiencia accesible conforme a WCAG AA.
+
+---
+
+### [ADR-042] · [2026-11-13 11:35] Estandarización de Preguntas Frecuentes, Homogeneización de Nombres entre Desktop y Móvil y Refactorización del Manual de Usuario
+- **Contexto**:
+  1. En `SettingsModal.jsx`, la sección 3 ("Infraestructura & Datos") exponía detalles del proveedor de cartografía externa ("OpenStreetMap HOT") y un botón para restablecer datos de demostración, los cuales no aportaban valor al usuario final e inducían a confusión o reseteos involuntarios.
+  2. En `DrawerMenu.jsx` (móviles), los nombres de las opciones diferían de los de escritorio (ej. *"Historial de reportes"*, *"Canjea tus puntos"*, *"Configuración de Zonas"* vs. *"Historial"*, *"Puntos"*, *"Configuración"*), y los accesos directos al tutorial dispersaban las opciones; se requería unificar la nomenclatura e iconografía al 100% entre ambas plataformas.
+  3. En la versión de escritorio (`Header.jsx`), los usuarios carecían de un acceso a *Preguntas Frecuentes* en la barra de navegación `<nav>`, creando una disparidad de opciones respecto a los usuarios móviles.
+  4. En `TutorialTourModal.jsx`, se requería estandarizar y sintetizar la redacción:
+     - En el Paso 2: sustituir "vecinos de a pie" por "vecinos", cambiar "Simbología Geométrica Universal (Accesible):" por "Simbología Universal:" y suprimir la mención técnica a WCAG.
+     - En el Paso 3: eliminar los badges secundarios ("Más rápido en la calle" y "Máxima precisión") para evitar sobrecarga cognitiva.
+     - En el Paso 4: sustituir el título por "Mantener presionado unos segundos" y eliminar la justificación técnica de llamadas involuntarias en la descripción.
+     - En el Paso 5: simplificar el encabezado a "Menú Vecinal".
+     - En el Paso 6: remover el icono de check verde, el título "¡Estás listo para recorrer y cuidar tu ciudad!" y el bloque de consejo de registro, dejando únicamente la indicación centrada de reconsulta en el Manual de Usuario.
+- **Decisión**:
+  1. En [`src/components/SettingsModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/SettingsModal.jsx):
+     - Eliminar por completo la sección *"Infraestructura & Datos"*, suprimiendo la tarjeta del proveedor OpenStreetMap HOT y el botón *"Restablecer datos de demostración"*.
+  2. En [`src/components/DrawerMenu.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/DrawerMenu.jsx):
+     - Estandarizar la nomenclatura e iconografía para replicar con exactitud el menú de escritorio: **Mapa**, **Historial** (`Clock`), **Puntos** (`Gift`), **Datos Personales** (`User`), **Configuración** (`Sliders`) y **Preguntas Frecuentes** (`HelpCircle`).
+     - Remover los botones directos del tutorial para unificar el punto de acceso.
+  3. En [`src/components/FaqModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/FaqModal.jsx):
+     - Renombrar el tutorial a **"Manual de Usuario"** y condicionar el banner a `{user?.isLoggedIn && (...)}`.
+  4. En [`src/components/Header.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/Header.jsx):
+     - Incorporar el botón *"Preguntas Frecuentes"* en la barra de navegación de escritorio (`<nav>`), garantizando paridad entre móvil y escritorio tanto para usuarios autenticados como para invitados.
+  5. En [`src/components/TutorialTourModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/TutorialTourModal.jsx):
+     - Aplicar la estandarización textual en los Pasos 2, 3, 4, 5 y 6, eliminando elementos distractores y badges técnicos innecesarios.
+- **Consecuencias**: Paridad e identidad de navegación 1:1 absoluta entre escritorio y móvil, experiencia de usuario más concisa y sin distracciones técnicas en el onboarding, y mayor seguridad de configuración al ocultar herramientas internas de demostración.
+
+---
+
+### [ADR-043] · [2026-11-13 11:55] Validación Única de Reportes, Desacoplamiento de Terminología y Mutación Dinámica de Marcos y Status de Usuarios
+- **Contexto**:
+  1. En `PinDetailsModal.jsx`, el botón de interacción social utilizaba el texto *"Agradecer / Me sirvió"* acompañado de la etiqueta *"Validación vecinal"*. Esta terminología resultaba ambigua y no representaba con precisión la acción cívica formal de certificar un incidente en el territorio.
+  2. Anteriormente, la reacción funcionaba como un toggle global y efímero (`rep.hasReacted`), sin registrar qué usuario había validado el reporte y permitiendo incrementar y decrementar el contador indefinidamente.
+  3. Asimismo, la mutación de reputación únicamente impactaba de forma superficial en el estado local del usuario activo, sin modificar el marco (*tier*), los puntos ni el estatus del autor/publicador original del incidente en la red ciudadana.
+- **Decisión**:
+  1. En [`src/components/PinDetailsModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/PinDetailsModal.jsx):
+     - Sustituir *"Agradecer / Me sirvió"* por el botón formal **"Validar"** (y **"Validado"** con tilde `Check` una vez confirmado).
+     - Eliminar por completo la leyenda adyacente *"Validación vecinal"*, mostrando en su lugar el estado cívico (`+5 pts por validar` o `Has validado este reporte`).
+     - Deshabilitar la acción tras su ejecución (`disabled={hasUserValidated}`), garantizando que la validación sea estrictamente **única por usuario**.
+  2. En [`src/context/AppContext.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/context/AppContext.jsx):
+     - Introducir la función canónica `calculateTier(validationsCount, isModerator)`:
+       - `< 5`: `bronce` (Marco Bronce).
+       - `5` a `9`: `plata` (Marco Plata).
+       - `10` a `19`: `oro` (Marco Oro).
+       - `>= 20`: `diamante` (Marco Diamante).
+     - Implementar `validateReport(reportId)`:
+       - Cada reporte almacena el array de validadores `validatedBy: string[]`.
+       - **El que valida** (vecino activo): suma +1 validación a su historial cívico, +5 puntos barriales y su rango/marco se recalcula inmediatamente.
+       - **El que publica** (autor del reporte): se localiza en la base comunitaria (`allUsers`), suma +1 validación recibida, +10 puntos por reporte confirmado y su rango/marco se actualiza tanto en su perfil como en la insignia visible del reporte (`authorTier`).
+       - En nuevos reportes publicados (`confirmAndPublishReport`), inicializar con `reactions: 0`, `hasReacted: false` y `validatedBy: []`.
+  3. En [`src/components/Header.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/Header.jsx):
+     - Habilitar `showRing={true}` en el avatar del usuario autenticado para que el marco activo (`avatar-bronce`, `avatar-plata`, `avatar-oro`, `avatar-diamante`) se visualice en tiempo real en la barra superior.
+  4. En [`src/components/TutorialTourModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/TutorialTourModal.jsx) y [`src/components/FaqModal.jsx`](file:///home/iescobar/itec/3ero/ui/efi/src/components/FaqModal.jsx):
+     - Actualizar referencias pedagógicas para unificar el concepto a la acción de **"Validar"**.
+- **Consecuencias**: Ciclo de gamificación cívica bidireccional completamente funcional y persistente, prevención de fraudes por votos duplicados y reflejo visual instantáneo de los marcos de reputación en toda la interfaz.

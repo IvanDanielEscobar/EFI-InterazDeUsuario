@@ -7,11 +7,13 @@ import {
   AlertTriangle,
   Award,
   Lock,
-  UserX
+  UserX,
+  Compass,
+  ChevronRight
 } from 'lucide-react';
 
 export default function FaqModal() {
-  const { activeModal, setActiveModal } = useApp();
+  const { activeModal, setActiveModal, startTutorial, user } = useApp();
 
   if (activeModal !== 'faq') return null;
 
@@ -24,7 +26,7 @@ export default function FaqModal() {
     >
       <div className="w-full max-w-md bg-slate-900 text-white rounded-3xl border border-slate-700 shadow-2xl p-5 sm:p-6 max-h-[88vh] overflow-y-auto flex flex-col">
         {/* Encabezado */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4 shrink-0">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center shrink-0">
               <HelpCircle className="w-5 h-5" />
@@ -47,6 +49,39 @@ export default function FaqModal() {
             <X className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Banner Manual de Usuario (Tutorial guiado interactivo exclusivo para usuarios logueados) */}
+        {user?.isLoggedIn && (
+          <div className="mb-3.5 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-slate-850 to-slate-850 border border-amber-400/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center shrink-0 shadow-sm">
+                <Compass className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h4 className="text-xs sm:text-sm font-black text-white">
+                    Manual de Usuario
+                  </h4>
+                  <span className="px-1.5 py-0.2 rounded-md bg-amber-400 text-slate-950 text-[9px] font-black uppercase">
+                    Tutorial
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-300">
+                  Paso a paso: Mapa, Alertas, Botón SOS y Menú
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => startTutorial(0)}
+              className="btn-interactive h-8 px-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 text-xs font-black shadow-md flex items-center justify-center gap-1.5 shrink-0 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer"
+              aria-label="Iniciar Manual de Usuario interactivo"
+            >
+              <span>Ver Manual</span>
+              <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+            </button>
+          </div>
+        )}
 
         {/* Listado de Preguntas */}
         <div className="space-y-3.5 text-xs flex-1">
@@ -79,8 +114,8 @@ export default function FaqModal() {
               <span>¿Qué significan los niveles de reputación?</span>
             </h4>
             <p className="text-slate-300 leading-relaxed text-xs">
-              Indican el compromiso ciudadano según las validaciones comunitarias ("Me sirvió") recibidas:
-              Bronce (1-4), Plata (5-9), Oro (10-20) y Diamante (+20). Cada nivel otorga puntos canjeables en comercios barriales.
+              Indican el compromiso ciudadano según las validaciones comunitarias ("Validar") recibidas y realizadas:
+              Bronce (1-4), Plata (5-9), Oro (10-19) y Diamante (+20). Cada nivel otorga puntos canjeables en comercios barriales.
             </p>
           </div>
 

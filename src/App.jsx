@@ -14,6 +14,7 @@ import SettingsModal from './components/SettingsModal';
 import FaqModal from './components/FaqModal';
 import HistoryModal from './components/HistoryModal';
 import PersonalDataModal from './components/PersonalDataModal';
+import TutorialTourModal from './components/TutorialTourModal';
 
 export default function App() {
   const { user, config, alertRadiusKm, activeReportsWithinRadius, toasts, setActiveModal } = useApp();
@@ -75,6 +76,7 @@ export default function App() {
       <FaqModal />
       <HistoryModal />
       <PersonalDataModal />
+      <TutorialTourModal />
 
       {/* Contenedor Flotante de Toasts Centrado en Pantalla */}
       <div
