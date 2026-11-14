@@ -5,10 +5,18 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Leaflet](https://img.shields.io/badge/Leaflet-1.9-199900?logo=leaflet&logoColor=white)](https://leafletjs.com/)
 [![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-HOT-7EBC6F?logo=openstreetmap&logoColor=white)](https://www.openstreetmap.org/)
-[![Vercel Ready](https://img.shields.io/badge/Vercel-Deployed-000000?logo=vercel&logoColor=white)](https://vercel.com/)
+[![Vercel Ready](https://img.shields.io/badge/Vercel-App_en_Vivo-000000?logo=vercel&logoColor=white)](https://efi-interaz-de-usuario.vercel.app/)
+[![Documento de Investigación](https://img.shields.io/badge/Google_Docs-Investigación_UX-4285F4?logo=googledocs&logoColor=white)](https://docs.google.com/document/d/1eqap2D5Huw8SKxRVbw4Clj_6ofckJ26YL6qH6NdJank/edit?usp=sharing)
 [![WCAG AA](https://img.shields.io/badge/Accessibility-WCAG_AA-blue)](https://www.w3.org/WAI/WCAG21/quickref/)
 
 Single Page Application (SPA) colaborativa, Mobile-First y de accesibilidad estricta (WCAG AA), diseñada para la prevención ciudadana, señalización geolocalizada de incidencias urbanas y auxilio comunitario inmediato en la ciudad de **Río Cuarto, Córdoba**.
+
+---
+
+## 🔗 Enlaces Oficiales del Proyecto
+
+- 🌐 **Aplicación Desplegada en Vivo (Vercel)**: [https://efi-interaz-de-usuario.vercel.app/](https://efi-interaz-de-usuario.vercel.app/)
+- 📄 **Documento de Investigación & Diseño UX (Google Docs)**: [Ver Documento de Investigación](https://docs.google.com/document/d/1eqap2D5Huw8SKxRVbw4Clj_6ofckJ26YL6qH6NdJank/edit?usp=sharing)
 
 ---
 
@@ -104,7 +112,7 @@ Para garantizar la accesibilidad de usuarios con daltonismo (protanopía, deuter
 - **Geocerca Geodésica (Haversine)**: Cálculo geodésico exacto tomando como referencia el centro neurálgico de Río Cuarto (Plaza Roca `[-33.1245, -64.3492]`). Radio dinámico de 1 km para vecinos y 5 km para moderadores (configurable hasta 15 km).
 
 ### 6. Gamificación Vecinal & Canje de Cupones
-- **Niveles de Reputación**: Bronce, Plata, Oro y Diamante acumulables por validaciones comunitarias ("Me sirvió").
+- **Niveles de Reputación**: Bronce, Plata, Oro y Diamante acumulables por validaciones comunitarias ("Validar") tanto para quien publica como para quien valida.
 - **Comercios Locales Adheridos**: Catálogo de cupones de descuento barriales con generación de códigos alfanuméricos copiables al portapapeles.
 
 ### 7. Formulario de Autenticación Limpio & Políticas de Privacidad
